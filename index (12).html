@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Lucky Ticket - Lottery Game</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bungee&family=Mukta:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0d0d;
+    --ticket-a: #ffd54a;
+    --ticket-b: #ff9800;
+    --ink: #1a1100;
+    --accent-a: #ff6d00;
+    --accent-b: #ff2d00;
+    --gold: #ffc400;
+    --win: #0a7d3b;
+    --soft: rgba(255, 255, 255, 0.08);
+    --line: rgba(26, 17, 0, 0.55);
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { --bg: #000; }
+  }
+  :root[data-theme="dark"] { --bg: #000; }
+
+  html { background: var(--bg); scroll-padding-top: env(safe-area-inset-top, 0px); }
+  *, *::before, *::after { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: #fff;
+    font-family: 'Mukta', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    font-size: 17px;
+    line-height: 1.5;
+  }
+  main { max-width: 520px; margin: 0 auto; padding: 20px 16px 40px; }
+
+  h1 {
+    font-family: 'Bungee', Impact, 'Arial Black', sans-serif;
+    font-weight: 400;
+    font-size: clamp(2.3rem, 12vw, 3.6rem);
+    line-height: 1;
+    margin: 6px 0 10px;
+    text-align: center;
+    background: linear-gradient(180deg, #fff3b0, var(--gold) 55%, var(--accent-a));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    filter: drop-shadow(0 0 14px rgba(255, 152, 0, 0.55));
+  }
+  .sub { margin: 0 0 16px; text-align: center; opacity: 0.85; }
+
+  .jackpot {
+    margin: 0 0 16px;
+    border: 2px solid var(--gold);
+    border-radius: 12px;
+    padding: 10px 12px;
+    text-align: center;
+    background: linear-gradient(90deg, rgba(255,196,0,0.08), rgba(255,196,0,0.22), rgba(255,196,0,0.08));
+    background-size: 200% 100%;
+    animation: shine 3.5s linear infinite;
+  }
+  .jackpot span { display: block; font-size: 0.95rem; opacity: 0.9; }
+  .jackpot b { font-family: 'Bungee', Impact, sans-serif; font-weight: 400; font-size: 1.8rem; color: var(--gold); }
+  @keyframes shine { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+
+  .coinbar {
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--soft); border-radius: 12px; padding: 10px 14px; margin-bottom: 18px;
+  }
+  .coinbar b { font-family: 'Bungee', Impact, sans-serif; font-weight: 400; font-size: 1.5rem; color: var(--gold); }
+
+  .ticket {
+    position: relative;
+    background: linear-gradient(135deg, var(--ticket-a), var(--ticket-b));
+    color: var(--ink);
+    border-radius: 16px;
+    padding: 20px 18px 18px;
+    box-shadow: 0 0 28px rgba(255, 152, 0, 0.35);
+  }
+  .ticket h2 { margin: 0 0 4px; font-size: 1.25rem; font-weight: 800; line-height: 1.25; }
+  .count { margin: 0 0 14px; font-weight: 600; }
+
+  .grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 14px; }
+  .num {
+    aspect-ratio: 1; min-height: 48px;
+    border-radius: 50%;
+    border: 2px solid var(--ink);
+    background: #fff;
+    color: var(--ink);
+    font: 800 1.15rem 'Mukta', system-ui, sans-serif;
+    cursor: pointer;
+  }
+  .num[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--gold); }
+  .num.hit { background: var(--win); border-color: #fff; color: #fff; box-shadow: 0 0 0 3px var(--win); }
+  .num:disabled { cursor: default; }
+
+  button:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+  .ticket button:focus-visible { outline-color: var(--ink); }
+
+  .row { display: flex; flex-wrap: wrap; gap: 8px; }
+  .ghost {
+    border: 2px solid var(--ink); background: transparent; color: var(--ink);
+    border-radius: 999px; padding: 8px 16px; font: 600 1rem 'Mukta', system-ui, sans-serif; cursor: pointer;
+  }
+  .ghost:disabled { opacity: 0.5; cursor: default; }
+
+  .tear { position: relative; margin: 20px -18px 16px; border-top: 3px dashed var(--line); }
+  .tear::before, .tear::after {
+    content: ''; position: absolute; top: -13px; width: 22px; height: 22px; border-radius: 50%; background: var(--bg);
+  }
+  .tear::before { left: -11px; }
+  .tear::after { right: -11px; }
+
+  .prizes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 0 0 16px; padding: 0; list-style: none; }
+  .prizes li { background: rgba(26, 17, 0, 0.12); border-radius: 10px; padding: 8px 6px; text-align: center; font-size: 0.95rem; line-height: 1.3; }
+  .prizes strong { display: block; font-size: 1.2rem; }
+
+  .play {
+    width: 100%; border: 0; border-radius: 12px; padding: 14px 16px;
+    background: linear-gradient(180deg, var(--accent-a), var(--accent-b)); color: #fff;
+    font: 400 1.25rem 'Bungee', Impact, 'Arial Black', sans-serif; letter-spacing: 0.02em; cursor: pointer;
+    box-shadow: 0 4px 0 #8a1a00;
+  }
+  .play:not(:disabled) { animation: pulse 1.8s ease-in-out infinite; }
+  .play:active:not(:disabled) { transform: translateY(3px); box-shadow: 0 1px 0 #8a1a00; }
+  .play:disabled { background: #6b5a45; box-shadow: none; cursor: default; color: #d8cdbd; }
+  @keyframes pulse { 0%, 100% { filter: brightness(1); } 50% { filter: brightness(1.25); } }
+
+  .result h2, .history h2 { font-size: 1.15rem; font-weight: 800; margin: 26px 0 10px; }
+  .balls { display: flex; gap: 14px; justify-content: center; }
+  .ball {
+    width: 66px; height: 66px; border-radius: 50%;
+    display: grid; place-items: center;
+    border: 2px dashed rgba(255, 255, 255, 0.5);
+    font: 400 1.6rem 'Bungee', Impact, sans-serif; color: rgba(255, 255, 255, 0.7);
+  }
+  .ball.rolling { border: 2px solid var(--gold); background: #fff; color: var(--ink); box-shadow: 0 0 16px rgba(255, 196, 0, 0.7); }
+  .ball.show { border: 2px solid #fff; background: #fff; color: var(--ink); animation: pop 0.35s ease-out; }
+  .ball.hit { background: var(--win); border-color: #fff; color: #fff; box-shadow: 0 0 18px rgba(10, 125, 59, 0.9); }
+  @keyframes pop { from { transform: scale(0.5); } to { transform: scale(1); } }
+
+  #msg { min-height: 3.2em; margin: 14px 0 0; font-weight: 600; text-align: center; }
+  #refill {
+    display: block; margin: 8px auto 0; border: 0; border-radius: 10px; padding: 10px 16px;
+    background: var(--gold); color: var(--ink); font: 800 1rem 'Mukta', system-ui, sans-serif; cursor: pointer;
+  }
+  #refill[hidden] { display: none; }
+
+  .history ul { list-style: none; margin: 0; padding: 0; }
+  .history li { background: var(--soft); border-radius: 10px; padding: 10px 12px; margin-bottom: 8px; font-size: 0.97rem; }
+  .history .none { opacity: 0.8; }
+
+  .note { margin-top: 28px; font-size: 0.9rem; opacity: 0.8; text-align: center; }
+
+  .confetti { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 10; }
+  .confetti i {
+    position: absolute; top: -16px; width: 9px; height: 15px; border-radius: 2px;
+    animation: fall 2.4s linear forwards;
+  }
+  @keyframes fall { to { transform: translateY(110vh) rotate(720deg); } }
+
+  @media (prefers-reduced-motion: reduce) {
+    .jackpot, .play:not(:disabled), .ball.show { animation: none; }
+  }
+</style>
+</head>
+<body>
+<main>
+  <h1>Lucky Ticket</h1>
+  <p class="sub">3 lucky number chuniye aur draw dekhiye. Yeh sirf maze ka game hai, asli paisa nahi lagta.</p>
+
+  <div class="jackpot">
+    <span>Teeno number match karein toh jeetiye</span>
+    <b>500 COINS</b>
+  </div>
+
+  <div class="coinbar">
+    <span>Aapke coins</span>
+    <b id="coins" aria-live="polite">100</b>
+  </div>
+
+  <section class="ticket" aria-labelledby="pick-title">
+    <h2 id="pick-title">3 number chuniye (1 se 20)</h2>
+    <p class="count" id="count">0/3 chune</p>
+    <div class="grid" id="grid"></div>
+    <div class="row">
+      <button type="button" class="ghost" id="quick">Mere liye chuniye</button>
+      <button type="button" class="ghost" id="clear">Saaf karein</button>
+    </div>
+
+    <div class="tear" aria-hidden="true"></div>
+
+    <ul class="prizes">
+      <li><strong>10</strong>1 number match</li>
+      <li><strong>50</strong>2 number match</li>
+      <li><strong>500</strong>3 number match</li>
+    </ul>
+    <button type="button" class="play" id="play">Draw karein (10 coins)</button>
+  </section>
+
+  <section class="result" aria-labelledby="res-title">
+    <h2 id="res-title">Draw ke number</h2>
+    <div class="balls" id="balls">
+      <div class="ball">?</div><div class="ball">?</div><div class="ball">?</div>
+    </div>
+    <p id="msg" aria-live="polite">Pehle 3 number chuniye, phir Draw karein dabaiye.</p>
+    <button type="button" id="refill" hidden>Naye 100 coins lein</button>
+  </section>
+
+  <section class="history" aria-labelledby="hist-title">
+    <h2 id="hist-title">Pichhle draw</h2>
+    <ul id="history"><li class="none">Abhi tak koi draw nahi hua.</li></ul>
+  </section>
+
+  <p class="note">Coins sirf is game ke andar ke points hain. Inhe paise mein nahi badla ja sakta.</p>
+</main>
+<div class="confetti" id="confetti" aria-hidden="true"></div>
+
+<script>
+  var COST = 10, START = 100, MAX_PICK = 3, RANGE = 20;
+  var PRIZES = { 0: 0, 1: 10, 2: 50, 3: 500 };
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  var coins = START;
+  var picks = new Set();
+  var hits = new Set();
+  var history = [];
+  var drawing = false;
+
+  var el = {
+    coins: document.getElementById('coins'),
+    count: document.getElementById('count'),
+    grid: document.getElementById('grid'),
+    quick: document.getElementById('quick'),
+    clear: document.getElementById('clear'),
+    play: document.getElementById('play'),
+    balls: Array.prototype.slice.call(document.querySelectorAll('#balls .ball')),
+    msg: document.getElementById('msg'),
+    refill: document.getElementById('refill'),
+    history: document.getElementById('history'),
+    confetti: document.getElementById('confetti')
+  };
+
+  try {
+    var saved = parseInt(localStorage.getItem('lucky_ticket_coins'), 10);
+    if (!isNaN(saved) && saved >= 0) coins = saved;
+  } catch (e) {}
+  function save() {
+    try { localStorage.setItem('lucky_ticket_coins', String(coins)); } catch (e) {}
+  }
+
+  function randInt(max) {
+    var a = new Uint32Array(1);
+    var limit = Math.floor(0x100000000 / max) * max;
+    do { crypto.getRandomValues(a); } while (a[0] >= limit);
+    return a[0] % max;
+  }
+  function pickUnique(n) {
+    var pool = [];
+    for (var i = 1; i <= RANGE; i++) pool.push(i);
+    var out = [];
+    for (var j = 0; j < n; j++) out.push(pool.splice(randInt(pool.length), 1)[0]);
+    return out;
+  }
+  function sleep(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+
+  function burst(count) {
+    if (reduce) return;
+    var colors = ['#ffc400', '#ff6d00', '#ffffff', '#ff2d00', '#2bd96b'];
+    for (var i = 0; i < count; i++) {
+      var p = document.createElement('i');
+      p.style.left = randInt(100) + '%';
+      p.style.background = colors[randInt(colors.length)];
+      p.style.animationDelay = (randInt(800) / 1000) + 's';
+      p.style.animationDuration = (1.8 + randInt(1200) / 1000) + 's';
+      el.confetti.appendChild(p);
+      (function (node) { setTimeout(function () { node.remove(); }, 4000); })(p);
+    }
+  }
+
+  var gridBtns = {};
+  for (var n = 1; n <= RANGE; n++) {
+    (function (num) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'num';
+      b.textContent = num;
+      b.setAttribute('aria-pressed', 'false');
+      b.setAttribute('aria-label', 'Number ' + num);
+      b.addEventListener('click', function () { toggle(num); });
+      el.grid.appendChild(b);
+      gridBtns[num] = b;
+    })(n);
+  }
+
+  function setMsg(t) { el.msg.textContent = t; }
+
+  function toggle(num) {
+    if (drawing) return;
+    hits.clear();
+    if (picks.has(num)) {
+      picks.delete(num);
+    } else if (picks.size < MAX_PICK) {
+      picks.add(num);
+    } else {
+      setMsg('Sirf 3 number chune ja sakte hain. Pehle koi number hata dijiye.');
+    }
+    render();
+  }
+
+  function render() {
+    el.coins.textContent = coins;
+    el.count.textContent = picks.size + '/' + MAX_PICK + ' chune';
+    for (var num = 1; num <= RANGE; num++) {
+      var b = gridBtns[num];
+      b.setAttribute('aria-pressed', picks.has(num) ? 'true' : 'false');
+      b.classList.toggle('hit', hits.has(num));
+      b.disabled = drawing;
+    }
+    el.quick.disabled = drawing;
+    el.clear.disabled = drawing;
+    el.play.disabled = drawing || picks.size !== MAX_PICK || coins < COST;
+    el.refill.hidden = !(coins < COST && !drawing);
+  }
+
+  function renderHistory() {
+    if (!history.length) {
+      el.history.innerHTML = '<li class="none">Abhi tak koi draw nahi hua.</li>';
+      return;
+    }
+    el.history.innerHTML = '';
+    history.forEach(function (h) {
+      var li = document.createElement('li');
+      var result = h.matches === 0 ? 'koi match nahi' : h.matches + ' match, +' + h.prize + ' coins';
+      li.textContent = 'Aapke: ' + h.mine.join(', ') + '  |  Draw: ' + h.win.join(', ') + '  |  ' + result;
+      el.history.appendChild(li);
+    });
+  }
+
+  function resetBalls() {
+    el.balls.forEach(function (b) {
+      b.textContent = '?';
+      b.className = 'ball';
+    });
+  }
+
+  el.quick.addEventListener('click', function () {
+    if (drawing) return;
+    picks = new Set(pickUnique(MAX_PICK));
+    hits.clear();
+    setMsg('Number chun liye gaye. Ab Draw karein dabaiye.');
+    render();
+  });
+
+  el.clear.addEventListener('click', function () {
+    if (drawing) return;
+    picks.clear();
+    hits.clear();
+    render();
+  });
+
+  el.refill.addEventListener('click', function () {
+    coins = START;
+    history = [];
+    save();
+    resetBalls();
+    renderHistory();
+    setMsg('Naye 100 coins mil gaye. Number chuniye aur khelna shuru kijiye.');
+    render();
+  });
+
+  el.play.addEventListener('click', async function () {
+    if (drawing || picks.size !== MAX_PICK || coins < COST) return;
+    drawing = true;
+    coins -= COST;
+    hits.clear();
+    resetBalls();
+    render();
+    setMsg('Draw ho raha hai...');
+
+    var mine = Array.from(picks).sort(function (a, b) { return a - b; });
+    var win = pickUnique(MAX_PICK);
+
+    // Teeno ball ghoomne lagti hain, phir ek ek karke ruk jati hain
+    var timers = [];
+    if (!reduce) {
+      timers = el.balls.map(function (b) {
+        b.className = 'ball rolling';
+        return setInterval(function () { b.textContent = randInt(RANGE) + 1; }, 70);
+      });
+    }
+
+    for (var i = 0; i < win.length; i++) {
+      await sleep(reduce ? 100 : 1000);
+      if (timers[i]) clearInterval(timers[i]);
+      var ball = el.balls[i];
+      ball.textContent = win[i];
+      ball.className = 'ball show';
+      if (picks.has(win[i])) {
+        ball.classList.add('hit');
+        hits.add(win[i]);
+      }
+      render();
+    }
+    await sleep(reduce ? 50 : 400);
+
+    var matches = win.filter(function (x) { return picks.has(x); }).length;
+    var prize = PRIZES[matches];
+    coins += prize;
+    history.unshift({ mine: mine, win: win, matches: matches, prize: prize });
+    history = history.slice(0, 5);
+    save();
+    drawing = false;
+
+    var text;
+    if (matches === 0) text = 'Is baar koi number match nahi hua. Dobara koshish kijiye.';
+    else if (matches === 3) text = 'Jackpot! Teeno number match hue. Aapne ' + prize + ' coins jeete!';
+    else text = 'Badhai ho! ' + matches + ' number match hue. Aapne ' + prize + ' coins jeete.';
+    if (coins < COST) text += ' Aapke coins khatam ho gaye hain, neeche se naye coins lijiye.';
+    setMsg(text);
+
+    if (matches > 0) burst({ 1: 20, 2: 55, 3: 130 }[matches]);
+
+    renderHistory();
+    render();
+  });
+
+  render();
+  renderHistory();
+</script>
+</body>
+</html>
