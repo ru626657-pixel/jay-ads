@@ -1,101 +1,190 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Firebase Coins</title>
-  <style>
-    body { font-family: Arial; max-width: 400px; margin: 50px auto; text-align: center; background: #111; color: #fff; }
-    input { width: 100%; padding: 12px; margin: 8px 0; border-radius: 6px; border: 1px solid #444; background: #222; color: #fff; }
-    button { padding: 10px 20px; margin: 5px; cursor: pointer; border: none; border-radius: 6px; background: #6b5bff; color: white; font-weight: bold; }
-    button:hover { background: #5a4ae0; }
-    #app { display: none; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Win Go + Coins</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0f0e24;color:#fff;font-family:system-ui,Arial;display:flex;justify-content:center;min-height:100vh}
+#app{width:100%;max-width:480px;background:linear-gradient(180deg,#2d1b4e,#1a0a2e);min-height:100vh}
+header{background:linear-gradient(90deg,#ff6b9d,#c44bff,#6b5bff);padding:14px;text-align:center;font-weight:800}
+.wal{margin:12px;padding:16px;border-radius:16px;background:linear-gradient(135deg,#6b4eff,#9b59b6);text-align:center}
+.modes{display:flex;gap:6px;margin:0 12px 12px}
+.mode{flex:1;background:#2a1f4e;border-radius:12px;padding:10px;text-align:center;font-size:12px;cursor:pointer}
+.mode.on{background:linear-gradient(135deg,#ff6b9d,#6b5bff)}
+.info{display:flex;justify-content:space-between;margin:0 12px 12px;padding:12px;background:linear-gradient(90deg,#3a1f6e,#5a2f9e);border-radius:12px;font-size:12px}
+.timer{font-size:22px;font-weight:bold;background:#000;padding:4px 10px;border-radius:6px}
+.cols{display:flex;gap:8px;margin:0 12px 12px}
+.cols button{flex:1;padding:12px;border:none;border-radius:10px;font-weight:700;color:#fff;cursor:pointer}
+.g{background:#22c55e}.v{background:#a855f7}.r{background:#ef4444}
+.nums{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:0 12px 12px}
+.ball{aspect-ratio:1;border-radius:50%;font-size:18px;font-weight:800;color:#fff;border:none;cursor:pointer}
+.bs{display:flex;gap:8px;margin:0 12px 12px}
+.bs button{flex:1;padding:14px;border:none;border-radius:12px;font-weight:700;color:#fff;cursor:pointer}
+.big{background:#f97316}.small{background:#3b82f6}
+.tabs{display:flex;gap:6px;margin:0 12px 8px}
+.tabs button{flex:1;background:#2a1f4e;border:none;border-radius:20px;padding:8px;color:#fff;cursor:pointer}
+.tabs .on{background:#f97316}
+.tbl{margin:0 12px;background:#1a0f2e;border-radius:12px;overflow:hidden}
+.tr{display:grid;grid-template-columns:2.2fr .8fr 1fr 1fr;padding:8px;font-size:11px;border-bottom:1px solid #2a1f4e;text-align:center}
+#login{position:fixed;inset:0;background:#0f0e24;display:flex;align-items:center;justify-content:center;z-index:10}
+.lbox{background:#2a1f4e;padding:24px;border-radius:16px;width:90%;max-width:360px;text-align:center}
+.lbox input{width:100%;padding:12px;margin:8px 0;border-radius:8px;border:1px solid #4a3fb5;background:#1a0f2e;color:#fff}
+.lbox button{width:48%;padding:12px;margin:4px;border:none;border-radius:8px;font-weight:700;cursor:pointer}
+#game{display:none}
+</style>
 </head>
 <body>
 
 <div id="login">
-  <h2>Login / Register</h2>
-  <input id="email" placeholder="Email">
-  <input id="pass" type="password" placeholder="Password">
-  <button onclick="register()">Register</button>
-  <button onclick="login()">Login</button>
+  <div class="lbox">
+    <h2>WIN GO</h2>
+    <input id="email" placeholder="Email">
+    <input id="pass" type="password" placeholder="Password">
+    <div>
+      <button onclick="register()" style="background:#22c55e">Register</button>
+      <button onclick="login()" style="background:#6b5bff">Login</button>
+    </div>
+  </div>
 </div>
 
 <div id="app">
-  <h2>Welcome <span id="uname"></span></h2>
-  <h3>Coins: <span id="coins">0</span></h3>
-  <button onclick="addCoins(100)">+100 Coins</button>
-  <button onclick="addCoins(500)">+500 Coins</button>
-  <button onclick="logout()">Logout</button>
+  <header>WIN GO PRACTICE</header>
+  <div class="wal">
+    <small>Coins</small>
+    <div style="font-size:28px;font-weight:bold" id="bal">0</div>
+    <div style="margin-top:10px">
+      <button onclick="addCoins(100)" style="background:#22c55e;border:none;padding:8px 16px;border-radius:20px;margin:0 4px">+100</button>
+      <button onclick="addCoins(500)" style="background:#6b5bff;border:none;padding:8px 16px;border-radius:20px;margin:0 4px">+500</button>
+      <button onclick="logout()" style="background:#ef4444;border:none;padding:8px 16px;border-radius:20px;margin:0 4px">Logout</button>
+    </div>
+  </div>
+
+  <div class="modes" id="modes"></div>
+  <div class="info">
+    <div><small>Period</small><div id="per">-</div></div>
+    <div style="text-align:right"><small>Time</small><div class="timer" id="timer">00:30</div></div>
+  </div>
+
+  <div class="cols">
+    <button class="g" data-t="g">Green</button>
+    <button class="v" data-t="v">Violet</button>
+    <button class="r" data-t="r">Red</button>
+  </div>
+  <div class="nums" id="nums"></div>
+  <div class="bs">
+    <button class="big" data-t="big">Big</button>
+    <button class="small" data-t="small">Small</button>
+  </div>
+
+  <div class="tabs">
+    <button class="on" onclick="showTab('h')">History</button>
+    <button onclick="showTab('m')">My Bets</button>
+  </div>
+  <div id="out"></div>
 </div>
 
 <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-  import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-  import { getFirestore, doc, setDoc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getFirestore, doc, setDoc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyDkUrZb5HFkKG3yw80Uh30kiqoDHNHeUtY",
-    authDomain: "coins-app-20bcc.firebaseapp.com",
-    projectId: "coins-app-20bcc",
-    storageBucket: "coins-app-20bcc.firebasestorage.app",
-    messagingSenderId: "631868404343",
-    appId: "1:631868404343:web:8d4acf46ee5ce65ab3cc72",
-    measurementId: "G-WRX3V70BG3"
-  };
+const firebaseConfig = {
+  apiKey: "AIzaSyDkUrZb5HFkKG3yw80Uh30kiqoDHNHeUtY",
+  authDomain: "coins-app-20bcc.firebaseapp.com",
+  projectId: "coins-app-20bcc",
+  storageBucket: "coins-app-20bcc.firebasestorage.app",
+  messagingSenderId: "631868404343",
+  appId: "1:631868404343:web:8d4acf46ee5ce65ab3cc72"
+};
 
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const db = getFirestore(app);
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
 
-  window.register = async () => {
-    const email = document.getElementById('email').value;
-    const pass = document.getElementById('pass').value;
-    try {
-      const cred = await createUserWithEmailAndPassword(auth, email, pass);
-      await setDoc(doc(db, "users", cred.user.uid), {
-        email: email,
-        coins: 1000
-      });
-      alert("Registered successfully!");
-    } catch (e) {
-      alert(e.message);
-    }
-  };
+let currentUser = null;
+let coins = 0;
+let dur = 30;
+let bets = [];
 
-  window.login = async () => {
-    const email = document.getElementById('email').value;
-    const pass = document.getElementById('pass').value;
-    try {
-      await signInWithEmailAndPassword(auth, email, pass);
-    } catch (e) {
-      alert(e.message);
-    }
-  };
+window.register = async () => {
+  const e = email.value, p = pass.value;
+  try {
+    const c = await createUserWithEmailAndPassword(auth, e, p);
+    await setDoc(doc(db, "users", c.user.uid), { email: e, coins: 1000 });
+    alert("Registered!");
+  } catch(err) { alert(err.message); }
+};
 
-  window.logout = () => signOut(auth);
+window.login = async () => {
+  try { await signInWithEmailAndPassword(auth, email.value, pass.value); }
+  catch(err) { alert(err.message); }
+};
 
-  window.addCoins = async (amount) => {
-    const user = auth.currentUser;
-    if (!user) return;
-    const ref = doc(db, "users", user.uid);
-    const snap = await getDoc(ref);
-    const newCoins = (snap.data().coins || 0) + amount;
-    await updateDoc(ref, { coins: newCoins });
-    document.getElementById('coins').textContent = newCoins;
-  };
+window.logout = () => signOut(auth);
 
-  onAuthStateChanged(auth, async (user) => {
-    if (user) {
-      document.getElementById('login').style.display = 'none';
-      document.getElementById('app').style.display = 'block';
-      document.getElementById('uname').textContent = user.email;
-      const snap = await getDoc(doc(db, "users", user.uid));
-      document.getElementById('coins').textContent = snap.data()?.coins || 0;
-    } else {
-      document.getElementById('login').style.display = 'block';
-      document.getElementById('app').style.display = 'none';
-    }
-  });
+window.addCoins = async (n) => {
+  if (!currentUser) return;
+  coins += n;
+  await updateDoc(doc(db, "users", currentUser.uid), { coins });
+  document.getElementById("bal").textContent = coins;
+};
+
+onAuthStateChanged(auth, async (user) => {
+  if (user) {
+    currentUser = user;
+    document.getElementById("login").style.display = "none";
+    document.getElementById("app").style.display = "block";
+    const snap = await getDoc(doc(db, "users", user.uid));
+    coins = snap.data()?.coins || 1000;
+    document.getElementById("bal").textContent = coins;
+    startGame();
+  } else {
+    document.getElementById("login").style.display = "flex";
+    document.getElementById("app").style.display = "none";
+  }
+});
+
+// Game logic
+const MODES = [[30,"30sec"],[60,"1Min"],[180,"3Min"],[300,"5Min"]];
+function startGame() {
+  document.getElementById("modes").innerHTML = MODES.map(([d,n]) =>
+    `<div class="mode${d===dur?' on':''}" onclick="setDur(${d})">Win Go<br>${n}</div>`).join("");
+  document.getElementById("nums").innerHTML = [0,1,2,3,4,5,6,7,8,9].map(n =>
+    `<button class="ball" style="background:${n%2?'#22c55e':'#ef4444'}" onclick="bet('n${n}')">${n}</button>`).join("");
+  setInterval(tick, 500);
+  drawHistory();
+}
+
+window.setDur = (d) => { dur = d; startGame(); };
+window.bet = async (t) => {
+  if (coins < 10) return alert("Not enough coins");
+  coins -= 10;
+  await updateDoc(doc(db, "users", currentUser.uid), { coins });
+  document.getElementById("bal").textContent = coins;
+  bets.push({ t, time: Date.now() });
+  alert("Bet placed: " + t);
+};
+window.showTab = (k) => {
+  if (k === "h") drawHistory();
+  else document.getElementById("out").innerHTML = "<div style='padding:20px;text-align:center'>My bets will show here</div>";
+};
+
+function drawHistory() {
+  let h = '<div class="tbl"><div class="tr" style="background:#2a1f4e;font-weight:bold"><span>Period</span><span>No</span><span>B/S</span><span>Color</span></div>';
+  for (let i = 1; i <= 8; i++) {
+    const n = Math.floor(Math.random()*10);
+    h += `<div class="tr"><span>2026...${i}</span><span>${n}</span><span>${n>=5?'Big':'Small'}</span><span>${n%2?'🟢':'🔴'}</span></div>`;
+  }
+  document.getElementById("out").innerHTML = h + "</div>";
+}
+
+function tick() {
+  const s = 30 - (Math.floor(Date.now()/1000) % 30);
+  document.getElementById("timer").textContent = "00:" + String(s).padStart(2,"0");
+  document.getElementById("per").textContent = "20261014" + Math.floor(Date.now()/30000);
+}
 </script>
 </body>
 </html>
