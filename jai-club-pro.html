@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Jai Club</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:Arial;background:#0a0e14;color:#fff}
+.screen{display:none;min-height:100vh;padding-bottom:65px}
+.screen.on{display:block}
+.header{background:linear-gradient(90deg,#1a1f2e,#252d3d);padding:12px 15px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100}
+.logo{font-size:20px;font-weight:700;background:linear-gradient(90deg,#f5c518,#ff8c00);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.bal{background:rgba(255,255,255,.1);padding:6px 14px;border-radius:20px;font-size:13px;cursor:pointer;backdrop-filter:blur(10px)}
+.bal span{color:#22c55e;font-weight:600}
+.banner{margin:12px;background:linear-gradient(135deg,#f59e0b,#ef4444);border-radius:16px;padding:20px;text-align:center}
+.banner h2{font-size:18px;margin-bottom:5px}
+.banner p{font-size:12px;opacity:.9}
+.notice{background:#1a1f2e;margin:0 12px 12px;padding:10px;border-radius:10px;font-size:11px;color:#9ca3af;overflow:hidden}
+.notice span{display:inline-block;animation:scroll 15s linear infinite}
+@keyframes scroll{0%{transform:translateX(100%)}100%{transform:translateX(-100%)}}
+.cats{display:flex;gap:8px;padding:10px 12px;overflow-x:auto;background:#12171e}
+.cats::-webkit-scrollbar{display:none}
+.cat{padding:8px 16px;background:#1c2330;border-radius:20px;font-size:12px;cursor:pointer;white-space:nowrap}
+.cat.on{background:linear-gradient(90deg,#f5c518,#ff8c00);color:#000;font-weight:600}
+.sec{padding:12px;font-size:14px;font-weight:600;display:flex;justify-content:space-between}
+.sec span{color:#f5c518;font-size:12px;font-weight:400}
+.games{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:0 12px 15px}
+.gc{background:linear-gradient(145deg,#1e2533,#151a23);border-radius:14px;padding:15px 8px;text-align:center;cursor:pointer;border:1px solid rgba(255,255,255,.05);transition:.2s}
+.gc:active{transform:scale(.95)}
+.gc .i{font-size:36px;margin-bottom:6px}
+.gc .n{font-size:11px;color:#9ca3af}
+.winbox{margin:0 12px 15px;background:#1a1f2e;border-radius:12px;padding:12px}
+.winbox h4{font-size:13px;color:#f5c518;margin-bottom:8px}
+.wi{display:flex;justify-content:space-between;padding:6px 0;font-size:12px;border-bottom:1px solid #2a3340}
+.wi:last-child{border:none}
+.wa{color:#22c55e}
+.bnav{position:fixed;bottom:0;left:0;right:0;background:#12171e;display:flex;border-top:1px solid #2a3340;z-index:100}
+.bnav div{flex:1;text-align:center;padding:8px 0;cursor:pointer;font-size:10px;color:#6b7280}
+.bnav div.on{color:#f5c518}
+.bnav .ic{font-size:20px;display:block}
+.auth-box{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:linear-gradient(180deg,#0a0e14,#1a1f2e)}
+.auth-card{background:#1a1f2e;padding:30px;border-radius:20px;width:100%;max-width:340px;border:1px solid rgba(255,255,255,.1)}
+.auth-card h2{text-align:center;background:linear-gradient(90deg,#f5c518,#ff8c00);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:20px;font-size:24px}
+.auth-card input{width:100%;padding:14px;margin-bottom:12px;border:none;border-radius:10px;background:#252d3d;color:#fff;font-size:14px}
+.auth-card button{width:100%;padding:14px;border:none;border-radius:10px;font-weight:700;cursor:pointer;font-size:14px}
+.btn-y{background:linear-gradient(90deg,#f5c518,#ff8c00);color:#000}
+.btn-link{background:transparent;color:#888;margin-top:10px}
+.msg{padding:10px;border-radius:8px;margin-bottom:12px;text-align:center;display:none}
+.msg.err{background:#ef4444;display:block}
+.msg.ok{background:#22c55e;display:block}
+.wcard{background:linear-gradient(135deg,#1e40af,#3b82f6);margin:15px;padding:25px;border-radius:16px;text-align:center}
+.wcard .amt{font-size:36px;font-weight:700;margin:8px 0}
+.btns{display:flex;gap:8px;padding:0 15px;margin-bottom:12px}
+.btn{flex:1;padding:12px;border:none;border-radius:10px;font-weight:600;cursor:pointer;color:#fff;font-size:13px}
+.btn-g{background:#22c55e}
+.btn-r{background:#ef4444}
+.hist{margin:15px;background:#1a1f2e;border-radius:12px;padding:15px}
+.hist h4{color:#f5c518;margin-bottom:10px}
+.hi{padding:8px 0;border-bottom:1px solid #2a3340;font-size:13px;display:flex;justify-content:space-between}
+.sky{height:220px;margin:10px;border-radius:16px;background:linear-gradient(180deg,#0a1628,#1a0a2e);position:relative;overflow:hidden}
+.plane{position:absolute;font-size:36px;transition:all .1s;z-index:5}
+.mult{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:42px;font-weight:700;color:#f5c518;text-shadow:0 0 20px rgba(245,197,24,.5)}
+.mult.crash{color:#ef4444}
+.sbox{background:#1a1f2e;margin:10px;padding:20px;border-radius:16px;text-align:center}
+.reels{display:flex;justify-content:center;gap:10px;margin:15px 0}
+.reel{width:65px;height:75px;background:#0a0e14;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:36px;border:2px solid #f5c518}
+.gi{text-align:center;padding:10px;color:#888}
+.gi.w{color:#22c55e}
+.gi.l{color:#ef4444}
+.gb{width:calc(100% - 20px);margin:10px;padding:14px;background:linear-gradient(90deg,#f5c518,#ff8c00);color:#000;border:none;border-radius:12px;font-weight:700;cursor:pointer;font-size:15px}
+.gb:disabled{background:#374151;color:#666}
+.gb.cash{background:linear-gradient(90deg,#ef4444,#dc2626);color:#fff}
+.back{cursor:pointer;font-size:20px}
+.timer{font-size:56px;font-weight:700;color:#f5c518;text-align:center;padding:10px}
+.color-btns{display:flex;gap:8px;padding:0 15px;margin:15px 0}
+.cbtn{flex:1;padding:18px;border:none;border-radius:12px;font-weight:700;cursor:pointer;color:#fff;font-size:14px}
+.cbtn.green{background:#22c55e}
+.cbtn.red{background:#ef4444}
+.cbtn.violet{background:#a855f7}
+.cbtn.sel{box-shadow:0 0 0 3px #f5c518}
+.num-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;padding:0 15px;margin-bottom:15px}
+.nbtn{aspect-ratio:1;background:#1a1f2e;border:none;border-radius:10px;color:#fff;font-size:18px;font-weight:700;cursor:pointer}
+.nbtn.sel{background:#f5c518;color:#000}
+.results{display:flex;gap:6px;padding:10px 15px;overflow-x:auto}
+.ball{min-width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700}
+.ball.g{background:#22c55e}
+.ball.r{background:#ef4444}
+.ball.v{background:#a855f7}
+</style>
+</head>
+<body>
+
+<div id="auth" class="screen on">
+<div class="auth-box">
+<div class="auth-card">
+<h2 id="authTitle">Login</h2>
+<div class="msg" id="authMsg"></div>
+<input type="email" id="email" placeholder="Email">
+<input type="password" id="pass" placeholder="Password (min 6)">
+<button class="btn-y" id="authBtn" onclick="doAuth()">Login</button>
+<button class="btn-link" onclick="toggleAuth()">Account नहीं? Signup</button>
+</div>
+</div>
+</div>
+
+<div id="home" class="screen">
+<div class="header">
+<div class="logo">✦ JAI CLUB</div>
+<div class="bal" onclick="show('wallet')">₹ <span id="hBal">0</span></div>
+</div>
+<div class="banner"><h2>🎁 Welcome Bonus ₹500</h2><p>First deposit pe extra bonus!</p></div>
+<div class="notice"><span>📢 Daily bonuses • Fast withdrawals • Play responsibly • 18+ only • Gambling can be addictive</span></div>
+<div class="cats">
+<div class="cat on" onclick="setCat('all',this)">ALL</div>
+<div class="cat" onclick="setCat('lottery',this)">Lottery</div>
+<div class="cat" onclick="setCat('popular',this)">Popular</div>
+<div class="cat" onclick="setCat('slots',this)">Slots</div>
+<div class="cat" onclick="setCat('casino',this)">Casino</div>
+<div class="cat" onclick="setCat('mini',this)">Mini</div>
+</div>
+<div class="sec">Games <span>ALL ></span></div>
+<div class="games" id="gamesGrid"></div>
+<div class="winbox">
+<h4>🏆 Today's Winners</h4>
+<div class="wi"><span>Mem***TXL</span><span class="wa">+₹1,960</span></div>
+<div class="wi"><span>Mem***ABC</span><span class="wa">+₹588</span></div>
+<div class="wi"><span>Mem***XYZ</span><span class="wa">+₹196</span></div>
+<div class="wi"><span>Mem***123</span><span class="wa">+₹98</span></div>
+</div>
+</div>
+
+<div id="wallet" class="screen">
+<div class="header"><div class="back" onclick="show('home')">←</div><div class="logo">💰 Wallet</div><div></div></div>
+<div class="wcard"><div style="font-size:12px;opacity:.8">Balance</div><div class="amt">₹ <span id="wBal">0</span></div></div>
+<div class="btns">
+<button class="btn btn-g" onclick="addMoney(100)">+100</button>
+<button class="btn btn-g" onclick="addMoney(500)">+500</button>
+<button class="btn btn-r" onclick="addMoney(-100)">-100</button>
+</div>
+<div class="hist"><h4>History</h4><div id="histList"><div class="hi"><span>खाली</span></div></div></div>
+</div>
+
+<div id="aviator" class="screen">
+<div class="header"><div class="back" onclick="show('home')">←</div><div class="logo">✈️ Aviator</div><div class="bal">₹ <span class="gBal">0</span></div></div>
+<div class="sky"><div class="plane" id="plane">✈️</div><div class="mult" id="mult">1.00x</div></div>
+<div class="gi" id="avInfo">Bet लगाओ और Cash Out करो</div>
+<button class="gb" id="avBet" onclick="startAv()">Bet ₹20</button>
+<button class="gb cash" id="avCash" onclick="cashOut()" style="display:none">💰 Cash Out</button>
+</div>
+
+<div id="slots" class="screen">
+<div class="header"><div class="back" onclick="show('home')">←</div><div class="logo">🎰 Slots</div><div class="bal">₹ <span class="gBal">0</span></div></div>
+<div class="sbox"><div class="reels"><div class="reel" id="r1">🍒</div><div class="reel" id="r2">🍋</div><div class="reel" id="r3">🍊</div></div><div class="gi" id="slInfo">Spin करो!</div></div>
+<button class="gb" onclick="spin()">🎰 Spin ₹20</button>
+</div>
+
+<div id="wingo" class="screen">
+<div class="header"><div class="back" onclick="show('home')">←</div><div class="logo">🎯 WinGo</div><div class="bal">₹ <span class="gBal">0</span></div></div>
+<div class="timer" id="wgTimer">15</div>
+<div class="results" id="wgResults"></div>
+<div class="gi" id="wgInfo">Color या Number चुनो</div>
+<div class="color-btns">
+<button class="cbtn green" onclick="betColor('Green',this)">Green</button>
+<button class="cbtn violet" onclick="betColor('Violet',this)">Violet</button>
+<button class="cbtn red" onclick="betColor('Red',this)">Red</button>
+</div>
+<div class="num-grid" id="numGrid"></div>
+<button class="gb" id="wgBet" onclick="confirmWingo()" disabled>Confirm ₹10</button>
+</div>
+
+<div id="k3" class="screen">
+<div class="header"><div class="back" onclick="show('home')">←</div><div class="logo">🎲 K3</div><div class="bal">₹ <span class="gBal">0</span></div></div>
+<div class="timer" id="k3Timer">20</div>
+<div class="gi" id="k3Info">Big या Small चुनो</div>
+<div class="btns">
+<button class="btn" style="background:#3b82f6" onclick="betK3('Big')">Big (11-18)</button>
+<button class="btn" style="background:#f59e0b" onclick="betK3('Small')">Small (3-10)</button>
+</div>
+</div>
+
+<div id="dice" class="screen">
+<div class="header"><div class="back" onclick="show('home')">←</div><div class="logo">🎲 Dice</div><div class="bal">₹ <span class="gBal">0</span></div></div>
+<div class="gi" id="diceShow" style="font-size:70px">🎲</div>
+<div class="gi" id="diceInfo">High या Low चुनो</div>
+<div class="btns">
+<button class="btn btn-g" onclick="betDice('High')">High (4-6)</button>
+<button class="btn btn-r" onclick="betDice('Low')">Low (1-3)</button>
+</div>
+</div>
+
+<div id="coin" class="screen">
+<div class="header"><div class="back" onclick="show('home')">←</div><div class="logo">🪙 Coin</div><div class="bal">₹ <span class="gBal">0</span></div></div>
+<div class="gi" id="coinShow" style="font-size:70px">🪙</div>
+<div class="gi" id="coinInfo">Heads या Tails</div>
+<div class="btns">
+<button class="btn" style="background:#f5c518;color:#000" onclick="betCoin('Heads')">Heads</button>
+<button class="btn" style="background:#6b7280" onclick="betCoin('Tails')">Tails</button>
+</div>
+</div>
+
+<div id="mines" class="screen">
+<div class="header"><div class="back" onclick="show('home')">←</div><div class="logo">💣 Mines</div><div class="bal">₹ <span class="gBal">0</span></div></div>
+<div class="gi" id="minesInfo">Safe या Risk चुनो</div>
+<div class="btns">
+<button class="btn btn-g" onclick="betMines('Safe')">Safe (1.5x)</button>
+<button class="btn btn-r" onclick="betMines('Risk')">Risk (3x)</button>
+</div>
+</div>
+
+<div id="account" class="screen">
+<div class="header"><div class="logo">👤 Account</div></div>
+<div style="padding:30px;text-align:center">
+<p id="accEmail" style="margin-bottom:10px;color:#888"></p>
+<p style="font-size:32px;color:#22c55e;margin-bottom:20px">₹ <span id="accBal">0</span></p>
+<button class="gb" onclick="logout()">Logout</button>
+</div>
+</div>
+
+<div class="bnav" id="bnav" style="display:none">
+<div class="on" onclick="show('home')" id="nH"><span class="ic">🏠</span>Home</div>
+<div onclick="show('wallet')" id="nW"><span class="ic">💰</span>Wallet</div>
+<div onclick="show('account')" id="nA"><span class="ic">👤</span>Me</div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getFirestore, doc, setDoc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+const firebaseConfig = {apiKey:"AIzaSyDkUrZb5HFkKG3yw80Uh30kiqoDHNHeUtY",authDomain:"coins-app-20bcc.firebaseapp.com",projectId:"coins-app-20bcc",storageBucket:"coins-app-20bcc.firebasestorage.app",messagingSenderId:"631868404343",appId:"1:631868404343:web:8d4acf46ee5ce65ab3cc72"};
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+const GAMES = {
+  all:[{n:'WinGo',i:'🎯',g:'wingo'},{n:'Aviator',i:'✈️',g:'aviator'},{n:'K3',i:'🎲',g:'k3'},{n:'Slots',i:'🎰',g:'slots'},{n:'Dice',i:'🎲',g:'dice'},{n:'Coin',i:'🪙',g:'coin'},{n:'Mines',i:'💣',g:'mines'},{n:'5D',i:'🔢',g:'wingo'}],
+  lottery:[{n:'WinGo',i:'🎯',g:'wingo'},{n:'K3',i:'🎲',g:'k3'},{n:'5D',i:'🔢',g:'wingo'},{n:'TRX',i:'⛓️',g:'wingo'}],
+  popular:[{n:'Aviator',i:'✈️',g:'aviator'},{n:'Crash',i:'📈',g:'aviator'},{n:'Rocket',i:'🚀',g:'aviator'}],
+  slots:[{n:'Classic',i:'🎰',g:'slots'},{n:'Fruits',i:'🍒',g:'slots'},{n:'Gems',i:'💎',g:'slots'},{n:'777',i:'7️⃣',g:'slots'}],
+  casino:[{n:'Baccarat',i:'🃏',g:'dice'},{n:'Roulette',i:'🎡',g:'wingo'},{n:'Poker',i:'♠️',g:'dice'}],
+  mini:[{n:'Mines',i:'💣',g:'mines'},{n:'Dice',i:'🎲',g:'dice'},{n:'Coin',i:'🪙',g:'coin'},{n:'Plinko',i:'⚪',g:'dice'}]
+};
+
+let isLogin=true,user=null,coins=0,cat='all';
+let avRun=false,avM=1,avIv=null;
+let wgTimer=15,wgIv=null,wgBet=null,wgType=null,wgResults=[];
+let k3Timer=20,k3Iv=null;
+
+window.toggleAuth=function(){isLogin=!isLogin;document.getElementById('authTitle').textContent=isLogin?'Login':'Signup';document.getElementById('authBtn').textContent=isLogin?'Login':'Signup';document.querySelector('.btn-link').textContent=isLogin?'Account नहीं? Signup':'Account है? Login'};
+
+window.doAuth=async function(){
+  const email=document.getElementById('email').value,pass=document.getElementById('pass').value,msg=document.getElementById('authMsg');
+  if(!email||pass.length<6){msg.className='msg err';msg.textContent='Email और Password (6+) लिखो';return}
+  try{if(isLogin)await signInWithEmailAndPassword(auth,email,pass);else{const c=await createUserWithEmailAndPassword(auth,email,pass);await setDoc(doc(db,"users",c.user.uid),{email,coins:1000})}}
+  catch(e){msg.className='msg err';msg.textContent=e.code.includes('wrong-password')?'गलत password':e.code.includes('user-not-found')?'Account नहीं':e.code.includes('email-already')?'Email है पहले से':'Error'}
+};
+
+window.logout=()=>signOut(auth);
+window.show=function(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));document.getElementById(id).classList.add('on');document.querySelectorAll('.bnav div').forEach(n=>n.classList.remove('on'));if(id==='home')document.getElementById('nH').classList.add('on');if(id==='wallet')document.getElementById('nW').classList.add('on');if(id==='account')document.getElementById('nA').classList.add('on');if(avIv&&id!=='aviator'){clearInterval(avIv);avRun=false}if(wgIv&&id!=='wingo')clearInterval(wgIv);if(k3Iv&&id!=='k3')clearInterval(k3Iv)};
+
+window.setCat=function(c,el){cat=c;document.querySelectorAll('.cat').forEach(t=>t.classList.remove('on'));el.classList.add('on');drawGames()};
+function drawGames(){const g=document.getElementById('gamesGrid');g.innerHTML='';GAMES[cat].forEach(it=>{const d=document.createElement('div');d.className='gc';d.innerHTML=`<div class="i">${it.i}</div><div class="n">${it.n}</div>`;d.onclick=()=>openGame(it.g);g.appendChild(d)})}
+window.openGame=function(g){show(g);if(g==='wingo')startWingo();if(g==='k3')startK3()};
+
+function updBal(){document.querySelectorAll('#hBal,#wBal,#accBal,.gBal').forEach(e=>e.textContent=coins)}
+window.addMoney=async function(amt){if(coins+amt<0)return alert('कम balance!');coins+=amt;await updateDoc(doc(db,"users",user.uid),{coins});updBal();addHist(amt>0?'Deposit':'Withdraw',amt)};
+function addHist(t,a){const l=document.getElementById('histList');if(l.children[0]?.textContent==='खाली')l.innerHTML='';const d=document.createElement('div');d.className='hi';d.innerHTML=`<span>${t}</span><span style="color:${a>0?'#22c55e':'#ef4444'}">${a>0?'+':''}${a}</span>`;l.insertBefore(d,l.firstChild)}
+
+// AVIATOR
+window.startAv=async function(){if(coins<20)return alert('कम!');coins-=20;updBal();await updateDoc(doc(db,"users",user.uid),{coins});avRun=true;avM=1;document.getElementById('avBet').style.display='none';document.getElementById('avCash').style.display='block';document.getElementById('avInfo').textContent='उड़ रहा...';const sky=document.querySelector('.sky'),plane=document.getElementById('plane');avIv=setInterval(()=>{avM+=0.05+Math.random()*0.05;document.getElementById('mult').textContent=avM.toFixed(2)+'x';const p=Math.min((avM-1)/10,1);plane.style.left=(10+p*(sky.offsetWidth-50))+'px';plane.style.bottom=(10+p*(sky.offsetHeight-50)*0.6)+'px';if(Math.random()<0.015+avM*0.002||avM>15)avCrash()},80)};
+window.cashOut=async function(){if(!avRun)return;clearInterval(avIv);avRun=false;const w=Math.floor(20*avM);coins+=w;updBal();await updateDoc(doc(db,"users",user.uid),{coins});document.getElementById('avInfo').textContent='🎉 +₹'+w;document.getElementById('avInfo').className='gi w';document.getElementById('avCash').style.display='none';document.getElementById('avBet').style.display='block';setTimeout(resetAv,2000)};
+function avCrash(){clearInterval(avIv);avRun=false;document.getElementById('mult').textContent='CRASH!';document.getElementById('mult').className='mult crash';document.getElementById('avInfo').textContent='💥 हार!';document.getElementById('avInfo').className='gi l';document.getElementById('avCash').style.display='none';document.getElementById('avBet').style.display='block';setTimeout(resetAv,2000)}
+function resetAv(){document.getElementById('mult').textContent='1.00x';document.getElementById('mult').className='mult';document.getElementById('plane').style.left='10px';document.getElementById('plane').style.bottom='10px';document.getElementById('avInfo').textContent='Bet लगाओ';document.getElementById('avInfo').className='gi'}
+
+// SLOTS
+const syms=['🍒','🍋','🍊','🍇','⭐','💎','7️⃣'];
+window.spin=async function(){if(coins<20)return alert('कम!');coins-=20;updBal();await updateDoc(doc(db,"users",user.uid),{coins});document.getElementById('slInfo').textContent='...';let c=0;const iv=setInterval(async()=>{['r1','r2','r3'].forEach(id=>document.getElementById(id).textContent=syms[Math.floor(Math.random()*syms.length)]);if(++c>15){clearInterval(iv);const s=[0,1,2].map(()=>syms[Math.floor(Math.random()*syms.length)]);document.getElementById('r1').textContent=s[0];document.getElementById('r2').textContent=s[1];document.getElementById('r3').textContent=s[2];if(s[0]===s[1]&&s[1]===s[2]){coins+=100;updBal();await updateDoc(doc(db,"users",user.uid),{coins});document.getElementById('slInfo').textContent='🎊 +₹100';document.getElementById('slInfo').className='gi w'}else if(s[0]===s[1]||s[1]===s[2]){coins+=30;updBal();await updateDoc(doc(db,"users",user.uid),{coins});document.getElementById('slInfo').textContent='✨ +₹30';document.getElementById('slInfo').className='gi w'}else{document.getElementById('slInfo').textContent='कोई मैच नहीं';document.getElementById('slInfo').className='gi l'}}},60)};
+
+// WINGO
+function initNums(){const g=document.getElementById('numGrid');g.innerHTML='';for(let i=0;i<=9;i++){const b=document.createElement('button');b.className='nbtn';b.textContent=i;b.onclick=()=>betNum(i,b);g.appendChild(b)}}
+function startWingo(){wgTimer=15;wgBet=null;wgType=null;document.getElementById('wgInfo').textContent='Color या Number चुनो';document.getElementById('wgInfo').className='gi';document.getElementById('wgBet').disabled=true;document.querySelectorAll('.cbtn,.nbtn').forEach(b=>b.classList.remove('sel'));if(wgIv)clearInterval(wgIv);wgIv=setInterval(()=>{wgTimer--;document.getElementById('wgTimer').textContent=wgTimer;if(wgTimer<=0){clearInterval(wgIv);wgResult()}},1000)}
+window.betColor=function(c,el){if(wgBet)return;wgBet=c;wgType='color';document.querySelectorAll('.cbtn,.nbtn').forEach(b=>b.classList.remove('sel'));el.classList.add('sel');document.getElementById('wgBet').disabled=false};
+window.betNum=function(n,el){if(wgBet)return;wgBet=n;wgType='num';document.querySelectorAll('.cbtn,.nbtn').forEach(b=>b.classList.remove('sel'));el.classList.add('sel');document.getElementById('wgBet').disabled=false};
+window.confirmWingo=async function(){if(!wgBet&&wgBet!==0)return;if(coins<10)return alert('कम!');coins-=10;updBal();await updateDoc(doc(db,"users",user.uid),{coins});document.getElementById('wgInfo').textContent='Bet: '+wgBet;document.getElementById('wgBet').disabled=true};
+async function wgResult(){const n=Math.floor(Math.random()*10);const c=n===0||n===5?'Violet':[1,3,7,9].includes(n)?'Green':'Red';wgResults.unshift({n,c});if(wgResults.length>8)wgResults.pop();showResults();let win=false,wAmt=0;if(wgType==='num'&&wgBet===n){win=true;wAmt=90}else if(wgType==='color'&&wgBet===c){win=true;wAmt=c==='Violet'?45:20}if(win){coins+=wAmt;updBal();await updateDoc(doc(db,"users",user.uid),{coins});document.getElementById('wgInfo').textContent='🎉 जीत! '+n+' ('+c+') +₹'+wAmt;document.getElementById('wgInfo').className='gi w'}else{document.getElementById('wgInfo').textContent='हार। '+n+' ('+c+')';document.getElementById('wgInfo').className='gi l'}setTimeout(startWingo,2500)}
+function showResults(){const r=document.getElementById('wgResults');r.innerHTML='';wgResults.forEach(x=>{const b=document.createElement('div');b.className='ball '+(x.c==='Green'?'g':x.c==='Red'?'r':'v');b.textContent=x.n;r.appendChild(b)})}
+
+// K3
+function startK3(){k3Timer=20;document.getElementById('k3Info').textContent='Big या Small चुनो';document.getElementById('k3Info').className='gi';if(k3Iv)clearInterval(k3Iv);k3Iv=setInterval(()=>{k3Timer--;document.getElementById('k3Timer').textContent=k3Timer;if(k3Timer<=0){clearInterval(k3Iv);setTimeout(startK3,2000)}},1000)}
+window.betK3=async function(c){if(coins<10)return alert('कम!');coins-=10;updBal();await updateDoc(doc(db,"users",user.uid),{coins});const sum=Math.floor(Math.random()*16)+3;const res=sum>=11?'Big':'Small';if(c===res){coins+=20;updBal();await updateDoc(doc(db,"users",user.uid),{coins});document.getElementById('k3Info').textContent='🎉 जीत! Sum:'+sum;document.getElementById('k3Info').className='gi w'}else{document.getElementById('k3Info').textContent='हार। Sum:'+sum;document.getElementById('k3Info').className='gi l'}};
+
+// DICE
+window.betDice=async function(choice){if(coins<10)return alert('कम!');coins-=10;updBal();await updateDoc(doc(db,"users",user.uid),{coins});const d=Math.floor(Math.random()*6)+1;document.getElementById('diceShow').textContent=['⚀','⚁','⚂','⚃','⚄','⚅'][d-1];const res=d>=4?'High':'Low';if(choice===res){coins+=20;updBal();await updateDoc(doc(db,"users",user.uid),{coins});document.getElementById('diceInfo').textContent='🎉 जीत!';document.getElementById('diceInfo').className='gi w'}else{document.getElementById('diceInfo').textContent='हार';document.getElementById('diceInfo').className='gi l'}};
+
+// COIN
+window.betCoin=async function(choice){if(coins<10)return alert('कम!');coins-=10;updBal();await updateDoc(doc(db,"users",user.uid),{coins});const res=Math.random()>0.5?'Heads':'Tails';document.getElementById('coinShow').textContent=res==='Heads'?'🪙':'⚪';if(choice===res){coins+=20;updBal();await updateDoc(doc(db,"users",user.uid),{coins});document.getElementById('coinInfo').textContent='🎉 जीत!';document.getElementById('coinInfo').className='gi w'}else{document.getElementById('coinInfo').textContent='हार। '+res;document.getElementById('coinInfo').className='gi l'}};
+
+// MINES
+window.betMines=async function(choice){if(coins<10)return alert('कम!');coins-=10;updBal();await updateDoc(doc(db,"users",user.uid),{coins});const safe=Math.random()>0.4;if((choice==='Safe'&&safe)||(choice==='Risk'&&!safe)){const w=choice==='Safe'?15:30;coins+=w;updBal();await updateDoc(doc(db,"users",user.uid),{coins});document.getElementById('minesInfo').textContent='🎉 +₹'+w;document.getElementById('minesInfo').className='gi w'}else{document.getElementById('minesInfo').textContent='💥 Boom!';document.getElementById('minesInfo').className='gi l'}};
+
+onAuthStateChanged(auth,async(u)=>{if(u){user=u;const ds=await getDoc(doc(db,"users",u.uid));if(ds.exists())coins=ds.data().coins||0;else{await setDoc(doc(db,"users",u.uid),{email:u.email,coins:1000});coins=1000}updBal();document.getElementById('accEmail').textContent=u.email;document.getElementById('auth').classList.remove('on');document.getElementById('home').classList.add('on');document.getElementById('bnav').style.display='flex';drawGames();initNums()}else{user=null;coins=0;document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));document.getElementById('auth').classList.add('on');document.getElementById('bnav').style.display='none'}});
+</script>
+</body>
+</html>
