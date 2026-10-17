@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Jai Club</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',Arial;background:#0d1117;color:#fff}
+.screen{display:none;min-height:100vh;padding-bottom:70px}
+.screen.on{display:block}
+.header{background:linear-gradient(135deg,#6366f1,#8b5cf6,#ec4899);padding:15px;display:flex;justify-content:space-between;align-items:center}
+.logo{font-size:22px;font-weight:800;display:flex;align-items:center;gap:5px}
+.bal{background:rgba(0,0,0,.3);padding:8px 16px;border-radius:25px;font-size:14px;cursor:pointer}
+.bal span{color:#4ade80;font-weight:700}
+.banner{margin:12px;background:linear-gradient(135deg,#f59e0b,#ef4444);border-radius:16px;padding:18px;text-align:center}
+.banner h2{font-size:16px}
+.notice{background:#1e293b;margin:0 12px 12px;padding:10px;border-radius:10px;font-size:11px;color:#94a3b8;overflow:hidden}
+.notice span{animation:scroll 20s linear infinite;display:inline-block}
+@keyframes scroll{0%{transform:translateX(100%)}100%{transform:translateX(-100%)}}
+.cats{display:flex;gap:8px;padding:10px 12px;overflow-x:auto}
+.cats::-webkit-scrollbar{display:none}
+.cat{padding:8px 18px;background:#1e293b;border-radius:20px;font-size:13px;cursor:pointer;white-space:nowrap}
+.cat.on{background:linear-gradient(90deg,#f59e0b,#f97316);color:#000;font-weight:600}
+.games{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:12px}
+.gc{background:linear-gradient(145deg,#1e293b,#0f172a);border-radius:16px;padding:18px 8px;text-align:center;cursor:pointer;border:1px solid #334155}
+.gc:active{transform:scale(.95)}
+.gc .i{font-size:32px;margin-bottom:6px}
+.gc .n{font-size:11px;color:#94a3b8}
+.bnav{position:fixed;bottom:0;left:0;right:0;background:#0f172a;display:flex;border-top:1px solid #1e293b;z-index:100}
+.bnav div{flex:1;text-align:center;padding:10px 0;cursor:pointer;font-size:11px;color:#64748b}
+.bnav div.on{color:#f59e0b}
+.bnav .ic{font-size:22px;display:block;margin-bottom:2px}
+.auth-box{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:linear-gradient(180deg,#0d1117,#1e293b)}
+.auth-card{background:#1e293b;padding:30px;border-radius:20px;width:100%;max-width:360px}
+.auth-card h2{text-align:center;font-size:26px;margin-bottom:20px;background:linear-gradient(90deg,#f59e0b,#f97316);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.auth-card input{width:100%;padding:14px;margin-bottom:12px;border:none;border-radius:12px;background:#0f172a;color:#fff;font-size:15px}
+.auth-card button{width:100%;padding:14px;border:none;border-radius:12px;font-weight:700;cursor:pointer;font-size:15px}
+.btn-main{background:linear-gradient(90deg,#f59e0b,#f97316);color:#000}
+.btn-link{background:transparent;color:#64748b;margin-top:8px}
+.msg{padding:12px;border-radius:10px;margin-bottom:12px;text-align:center;display:none}
+.msg.err{background:#ef4444;display:block}
+.msg.ok{background:#22c55e;display:block}
+.back{cursor:pointer;font-size:22px}
+.wcard{background:linear-gradient(135deg,#3b82f6,#8b5cf6);margin:15px;padding:25px;border-radius:20px;text-align:center}
+.wcard .amt{font-size:36px;font-weight:700;margin:8px 0}
+.btns{display:flex;gap:10px;padding:0 15px}
+.btn{flex:1;padding:14px;border:none;border-radius:12px;font-weight:600;cursor:pointer;color:#fff}
+.btn-g{background:#22c55e}
+.btn-r{background:#ef4444}
+.hist{margin:15px;background:#1e293b;border-radius:16px;padding:15px}
+.hist h4{color:#f59e0b;margin-bottom:10px}
+.hi{padding:10px 0;border-bottom:1px solid #334155;font-size:13px;display:flex;justify-content:space-between}
+
+/* COLOR PREDICTION */
+.cp-header{background:linear-gradient(135deg,#6366f1,#8b5cf6);padding:15px;border-radius:0 0 20px 20px}
+.cp-wallet{background:rgba(0,0,0,.2);border-radius:16px;padding:15px;text-align:center;margin-bottom:12px}
+.cp-wallet .amt{font-size:28px;font-weight:700}
+.cp-wallet .lbl{font-size:12px;opacity:.8}
+.cp-actions{display:flex;gap:10px}
+.cp-actions button{flex:1;padding:12px;border:none;border-radius:25px;font-weight:700;cursor:pointer}
+.cp-actions .wit{background:#f97316;color:#fff}
+.cp-actions .dep{background:#22c55e;color:#fff}
+.periods{display:flex;gap:8px;padding:12px;overflow-x:auto}
+.periods::-webkit-scrollbar{display:none}
+.period{background:#1e293b;padding:10px 15px;border-radius:12px;text-align:center;cursor:pointer;min-width:70px}
+.period.on{background:linear-gradient(135deg,#8b5cf6,#6366f1)}
+.period .t{font-size:11px;opacity:.7}
+.period .n{font-size:13px;font-weight:600}
+.game-info{background:#1e293b;margin:0 12px;border-radius:16px;padding:15px;display:flex;justify-content:space-between;align-items:center}
+.game-info .left{font-size:13px}
+.game-info .right{text-align:right}
+.timer-box{display:flex;gap:4px}
+.timer-box span{background:#0f172a;padding:8px 10px;border-radius:8px;font-size:20px;font-weight:700;min-width:30px;text-align:center}
+.period-num{font-size:12px;color:#94a3b8;margin-top:5px}
+.colors{display:flex;gap:10px;padding:15px 12px}
+.cbtn{flex:1;padding:16px;border:none;border-radius:12px;font-weight:700;cursor:pointer;color:#fff;font-size:15px}
+.cbtn.green{background:#22c55e}
+.cbtn.violet{background:#a855f7}
+.cbtn.red{background:#ef4444}
+.cbtn.sel{box-shadow:0 0 0 3px #f59e0b}
+.nums{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;padding:0 12px 15px}
+.nbtn{aspect-ratio:1;border:none;border-radius:50%;font-size:18px;font-weight:700;cursor:pointer;color:#fff}
+.nbtn.g{background:linear-gradient(135deg,#22c55e,#16a34a)}
+.nbtn.r{background:linear-gradient(135deg,#ef4444,#dc2626)}
+.nbtn.v{background:linear-gradient(135deg,#a855f7,#7c3aed)}
+.nbtn.sel{box-shadow:0 0 0 3px #f59e0b}
+.multipliers{display:flex;gap:6px;padding:0 12px 12px;align-items:center}
+.multipliers .lbl{font-size:12px;color:#94a3b8}
+.mult{padding:8px 12px;background:#1e293b;border:none;border-radius:8px;color:#fff;cursor:pointer;font-size:12px}
+.mult.on{background:#22c55e}
+.size-btns{display:flex;padding:0 12px 15px}
+.size-btns button{flex:1;padding:14px;border:none;font-weight:700;cursor:pointer;color:#fff;font-size:15px}
+.size-btns .big{background:linear-gradient(90deg,#f59e0b,#f97316);border-radius:12px 0 0 12px}
+.size-btns .small{background:linear-gradient(90deg,#3b82f6,#6366f1);border-radius:0 12px 12px 0}
+.tabs{display:flex;gap:8px;padding:0 12px 12px}
+.tab{padding:10px 16px;background:#1e293b;border:none;border-radius:20px;color:#fff;cursor:pointer;font-size:12px}
+.tab.on{background:#3b82f6}
+.history-table{margin:0 12px;background:#1e293b;border-radius:16px;overflow:hidden}
+.history-table table{width:100%;border-collapse:collapse}
+.history-table th,.history-table td{padding:12px 8px;text-align:center;font-size:12px}
+.history-table th{background:#0f172a;color:#94a3b8}
+.history-table td{border-bottom:1px solid #334155}
+.dot{width:10px;height:10px;border-radius:50%;display:inline-block;margin:0 2px}
+.dot.g{background:#22c55e}
+.dot.r{background:#ef4444}
+.dot.v{background:#a855f7}
+.pagination{display:flex;justify-content:center;align-items:center;gap:15px;padding:15px}
+.pagination button{background:#1e293b;border:none;color:#fff;padding:8px 15px;border-radius:8px;cursor:pointer}
+
+/* AVIATOR */
+.sky{height:250px;margin:12px;border-radius:20px;background:linear-gradient(180deg,#1e1b4b,#0f172a);position:relative;overflow:hidden}
+.plane{position:absolute;font-size:40px;transition:all .1s;z-index:5}
+.mult-display{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:48px;font-weight:800;color:#f59e0b;text-shadow:0 0 30px rgba(245,158,11,.5)}
+.mult-display.crash{color:#ef4444}
+.gi{text-align:center;padding:12px;color:#94a3b8}
+.gi.w{color:#22c55e}
+.gi.l{color:#ef4444}
+.gb{width:calc(100% - 24px);margin:12px;padding:16px;background:linear-gradient(90deg,#f59e0b,#f97316);color:#000;border:none;border-radius:14px;font-weight:700;cursor:pointer;font-size:16px}
+.gb.cash{background:linear-gradient(90deg,#ef4444,#dc2626);color:#fff}
+
+/* SLOTS */
+.slot-machine{background:linear-gradient(145deg,#1e293b,#0f172a);margin:12px;padding:25px;border-radius:20px;text-align:center;border:2px solid #334155}
+.reels{display:flex;justify-content:center;gap:12px;margin:20px 0}
+.reel{width:70px;height:80px;background:#0f172a;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:40px;border:3px solid #f59e0b}
+</style>
+</head>
+<body>
+
+<div id="auth" class="screen on">
+<div class="auth-box">
+<div class="auth-card">
+<h2 id="authTitle">Login</h2>
+<div class="msg" id="authMsg"></div>
+<input type="email" id="email" placeholder="Email">
+<input type="password" id="pass" placeholder="Password">
+<button class="btn-main" id="authBtn" onclick="doAuth()">Login</button>
+<button class="btn-link" onclick="toggleAuth()">Account नहीं? Signup</button>
+<button class="btn-link" onclick="showReset()" id="forgotBtn">Password भूल गए?</button>
+</div>
+</div>
+</div>
+
+<div id="reset" class="screen">
+<div class="auth-box">
+<div class="auth-card">
+<h2>Reset Password</h2>
+<div class="msg" id="resetMsg"></div>
+<input type="email" id="resetEmail" placeholder="Email">
+<button class="btn-main" onclick="sendReset()">Reset Link भेजो</button>
+<button class="btn-link" onclick="show('auth')">← Back to Login</button>
+</div>
+</div>
+</div>
+
+<div id="home" class="screen">
+<div class="header"><div class="logo">🎮 JAI CLUB</div><div class="bal" onclick="show('wallet')">₹ <span id="hBal">0</span></div></div>
+<div class="banner"><h2>🎁 Welcome Bonus ₹500</h2></div>
+<div class="notice"><span>📢 Thanks to all members! Play responsibly. 18+ only.</span></div>
+<div class="cats">
+<div class="cat on" onclick="setCat('all',this)">ALL</div>
+<div class="cat" onclick="setCat('lottery',this)">Lottery</div>
+<div class="cat" onclick="setCat('popular',this)">Popular</div>
+<div class="cat" onclick="setCat('slots',this)">Slots</div>
+<div class="cat" onclick="setCat('mini',this)">Mini</div>
+</div>
+<div class="games" id="gamesGrid"></div>
+</div>
+
+<div id="wallet" class="screen">
+<div class="header"><div class="back" onclick="show('home')">←</div><div class="logo">💰 Wallet</div><div></div></div>
+<div class="wcard"><div style="opacity:.8">Balance</div><div class="amt">₹ <span id="wBal">0</span></div></div>
+<div class="btns"><button class="btn btn-g" onclick="addMoney(100)">+100</button><button class="btn btn-g" onclick="addMoney(500)">+500</button><button class="btn btn-r" onclick="addMoney(-100)">-100</button></div>
+<div class="hist"><h4>History</h4><div id="histList"><div class="hi"><span>खाली</span></div></div></div>
+</div>
+
+<div id="colorpred" class="screen">
+<div class="cp-header">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><div class="back" onclick="show('home')">←</div><div class="logo">🎨 Color Prediction</div><div></div></div>
+<div class="cp-wallet"><div class="amt">₹ <span class="gBal">0</span></div><div class="lbl">Wallet balance</div></div>
+<div class="cp-actions"><button class="wit" onclick="show('wallet')">Withdraw</button><button class="dep" onclick="show('wallet')">Deposit</button></div>
+</div>
+<div class="periods">
+<div class="period on" onclick="setPeriod(30,this)"><div class="t">⏱</div><div class="n">30sec</div></div>
+<div class="period" onclick="setPeriod(60,this)"><div class="t">⏱</div><div class="n">1Min</div></div>
+<div class="period" onclick="setPeriod(180,this)"><div class="t">⏱</div><div class="n">3Min</div></div>
+<div class="period" onclick="setPeriod(300,this)"><div class="t">⏱</div><div class="n">5Min</div></div>
+</div>
+<div class="game-info">
+<div class="left">How to play<br><small style="color:#94a3b8">Win Go 30sec</small></div>
+<div class="right"><div style="font-size:11px;color:#94a3b8">Time remaining</div><div class="timer-box" id="cpTimer"><span>0</span><span>0</span><span>:</span><span>3</span><span>0</span></div><div class="period-num" id="cpPeriod">20261017001</div></div>
+</div>
+<div class="colors">
+<button class="cbtn green" onclick="betCP('Green',this)">Green</button>
+<button class="cbtn violet" onclick="betCP('Violet',this)">Violet</button>
+<button class="cbtn red" onclick="betCP('Red',this)">Red</button>
+</div>
+<div class="nums" id="cpNums"></div>
+<div class="multipliers"><span class="lbl">Random</span><button class="mult on" onclick="setMult(1,this)">X1</button><button class="mult" onclick="setMult(5,this)">X5</button><button class="mult" onclick="setMult(10,this)">X10</button><button class="mult" onclick="setMult(20,this)">X20</button><button class="mult" onclick="setMult(50,this)">X50</button><button class="mult" onclick="setMult(100,this)">X100</button></div>
+<div class="size-btns"><button class="big" onclick="betCP('Big',this)">Big</button><button class="small" onclick="betCP('Small',this)">Small</button></div>
+<div class="tabs"><button class="tab on">Game history</button><button class="tab">Chart</button><button class="tab">My history</button></div>
+<div class="history-table"><table><thead><tr><th>Period</th><th>Number</th><th>Big Small</th><th>Color</th></tr></thead><tbody id="cpHistory"></tbody></table></div>
+<div class="pagination"><button>‹</button><span>1/1</span><button>›</button></div>
+<div class="gi" id="cpInfo">Bet लगाओ</div>
+<button class="gb" id="cpBet" onclick="confirmCP()" disabled>Confirm ₹<span id="betAmt">10</span></button>
+</div>
+
+<div id="aviator" class="screen">
+<div class="header"><div class="back" onclick="show('home')">←</div><div class="logo">✈️ Aviator</div><div class="bal">₹ <span class="gBal">0</span></div></div>
+<div class="sky"><div class="plane" id="plane">✈️</div><div class="mult-display" id="mult">1.00x</div></div>
+<div class="gi" id="avInfo">Bet लगाओ और Cash Out करो</div>
+<button class="gb" id="avBet" onclick="startAv()">Bet ₹20</button>
+<button class="gb cash" id="avCash" onclick="cashOut()" style="display:none">💰 Cash Out</button>
+</div>
+
+<div id="slots" class="screen">
+<div class="header"><div class="back" onclick="show('home')">←</div><div class="logo">🎰 Slots</div><div class="bal">₹ <span class="gBal">0</span></div></div>
+<div class="slot-machine"><div class="reels"><div class="reel" id="r1">🍒</div><div class="reel" id="r2">🍋</div><div class="reel" id="r3">🍊</div></div><div class="gi" id="slInfo">Spin करो!</div></div>
+<button class="gb" onclick="spin()">🎰 Spin ₹20</button>
+</div>
+
+<div id="account" class="screen">
+<div class="header"><div class="logo">👤 Account</div></div>
+<div style="padding:30px;text-align:center"><p id="accEmail" style="color:#94a3b8;margin-bottom:10px"></p><p style="font-size:32px;color:#22c55e;margin-bottom:20px">₹ <span id="accBal">0</span></p><button class="gb" onclick="logout()">Logout</button></div>
+</div>
+
+<div class="bnav" id="bnav" style="display:none">
+<div class="on" onclick="show('home')" id="nH"><span class="ic">🏠</span>Home</div>
+<div onclick="show('wallet')" id="nW"><span class="ic">💰</span>Wallet</div>
+<div onclick="show('account')" id="nA"><span class="ic">👤</span>Me</div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getFirestore, doc, setDoc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+const firebaseConfig = {apiKey:"AIzaSyDkUrZb5HFkKG3yw80Uh30kiqoDHNHeUtY",authDomain:"coins-app-20bcc.firebaseapp.com",projectId:"coins-app-20bcc",storageBucket:"coins-app-20bcc.firebasestorage.app",messagingSenderId:"631868404343",appId:"1:631868404343:web:8d4acf46ee5ce65ab3cc72"};
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+const GAMES = {
+  all:[{n:'Color Pred',i:'🎨',g:'colorpred'},{n:'Aviator',i:'✈️',g:'aviator'},{n:'Slots',i:'🎰',g:'slots'},{n:'WinGo',i:'🎯',g:'colorpred'},{n:'K3',i:'🎲',g:'colorpred'},{n:'Dice',i:'🎲',g:'colorpred'},{n:'Coin',i:'🪙',g:'colorpred'},{n:'Mines',i:'💣',g:'colorpred'}],
+  lottery:[{n:'Color Pred',i:'🎨',g:'colorpred'},{n:'WinGo',i:'🎯',g:'colorpred'},{n:'K3',i:'🎲',g:'colorpred'},{n:'5D',i:'🔢',g:'colorpred'}],
+  popular:[{n:'Aviator',i:'✈️',g:'aviator'},{n:'Crash',i:'📈',g:'aviator'},{n:'Rocket',i:'🚀',g:'aviator'}],
+  slots:[{n:'Classic',i:'🎰',g:'slots'},{n:'Fruits',i:'🍒',g:'slots'},{n:'Gems',i:'💎',g:'slots'}],
+  mini:[{n:'Mines',i:'💣',g:'colorpred'},{n:'Dice',i:'🎲',g:'colorpred'},{n:'Coin',i:'🪙',g:'colorpred'}]
+};
+
+let isLogin=true,user=null,coins=0,cat='all';
+let cpTime=30,cpTimer=30,cpIv=null,cpBet=null,cpMult=1,cpPeriod=20261017001,cpHistory=[];
+let avRun=false,avM=1,avIv=null;
+
+window.toggleAuth=function(){isLogin=!isLogin;document.getElementById('authTitle').textContent=isLogin?'Login':'Signup';document.getElementById('authBtn').textContent=isLogin?'Login':'Signup';document.querySelector('.btn-link').textContent=isLogin?'Account नहीं? Signup':'Account है? Login';document.getElementById('forgotBtn').style.display=isLogin?'block':'none'};
+window.showReset=function(){show('reset')};
+window.sendReset=async function(){const email=document.getElementById('resetEmail').value;const msg=document.getElementById('resetMsg');if(!email){msg.className='msg err';msg.textContent='Email लिखो';return}try{await sendPasswordResetEmail(auth,email);msg.className='msg ok';msg.textContent='✅ Reset link भेज दिया!'}catch(e){msg.className='msg err';msg.textContent='Error: '+e.code}};
+
+window.doAuth=async function(){const email=document.getElementById('email').value,pass=document.getElementById('pass').value,msg=document.getElementById('authMsg');if(!email||pass.length<6){msg.className='msg err';msg.textContent='Email और Password (6+) लिखो';return}try{if(isLogin)await signInWithEmailAndPassword(auth,email,pass);else{const c=await createUserWithEmailAndPassword(auth,email,pass);await setDoc(doc(db,"users",c.user.uid),{email,coins:1000})}}catch(e){msg.className='msg err';msg.textContent=e.code.includes('wrong-password')?'गलत password':e.code.includes('user-not-found')?'Account नहीं':e.code.includes('email-already')?'Email है पहले से':'Error'}};
+window.logout=()=>signOut(auth);
+window.show=function(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));document.getElementById(id).classList.add('on');document.querySelectorAll('.bnav div').forEach(n=>n.classList.remove('on'));if(id==='home')document.getElementById('nH').classList.add('on');if(id==='wallet')document.getElementById('nW').classList.add('on');if(id==='account')document.getElementById('nA').classList.add('on');if(cpIv&&id!=='colorpred')clearInterval(cpIv);if(avIv&&id!=='aviator'){clearInterval(avIv);avRun=false}};
+window.setCat=function(c,el){cat=c;document.querySelectorAll('.cat').forEach(t=>t.classList.remove('on'));el.classList.add('on');drawGames()};
+function drawGames(){const g=document.getElementById('gamesGrid');g.innerHTML='';GAMES[cat].forEach(it=>{const d=document.createElement('div');d.className='gc';d.innerHTML=`<div class="i">${it.i}</div><div class="n">${it.n}</div>`;d.onclick=()=>openGame(it.g);g.appendChild(d)})}
+window.openGame=function(g){show(g);if(g==='colorpred'){initCP();startCP()}};
+
+function updBal(){document.querySelectorAll('#hBal,#wBal,#accBal,.gBal').forEach(e=>e.textContent=coins)}
+window.addMoney=async function(amt){if(coins+amt<0)return alert('कम!');coins+=amt;await updateDoc(doc(db,"users",user.uid),{coins});updBal();addHist(amt>0?'Deposit':'Withdraw',amt)};
+function addHist(t,a){const l=document.getElementById('histList');if(l.children[0]?.textContent==='खाली')l.innerHTML='';const d=document.createElement('div');d.className='hi';d.innerHTML=`<span>${t}</span><span style="color:${a>0?'#22c55e':'#ef4444'}">${a>0?'+':''}${a}</span>`;l.insertBefore(d,l.firstChild)}
+
+// COLOR PREDICTION
+function initCP(){const g=document.getElementById('cpNums');g.innerHTML='';for(let i=0;i<=9;i++){const c=i===0||i===5?'v':[1,3,7,9].includes(i)?'g':'r';const b=document.createElement('button');b.className='nbtn '+c;b.textContent=i;b.onclick=()=>betCP(i,b);g.appendChild(b)}showCPHistory()}
+window.setPeriod=function(t,el){cpTime=t;document.querySelectorAll('.period').forEach(p=>p.classList.remove('on'));el.classList.add('on');startCP()};
+window.setMult=function(m,el){cpMult=m;document.getElementById('betAmt').textContent=10*m;document.querySelectorAll('.mult').forEach(x=>x.classList.remove('on'));el.classList.add('on')};
+function startCP(){cpTimer=cpTime;cpBet=null;cpPeriod++;document.getElementById('cpPeriod').textContent=cpPeriod;document.getElementById('cpInfo').textContent='Bet लगाओ';document.getElementById('cpInfo').className='gi';document.getElementById('cpBet').disabled=true;document.querySelectorAll('.cbtn,.nbtn,.size-btns button').forEach(b=>b.classList.remove('sel'));if(cpIv)clearInterval(cpIv);updateTimer();cpIv=setInterval(()=>{cpTimer--;updateTimer();if(cpTimer<=0){clearInterval(cpIv);cpResult()}},1000)}
+function updateTimer(){const m=Math.floor(cpTimer/60),s=cpTimer%60;const t=document.getElementById('cpTimer');t.innerHTML=`<span>${Math.floor(m/10)}</span><span>${m%10}</span><span>:</span><span>${Math.floor(s/10)}</span><span>${s%10}</span>`}
+window.betCP=function(c,el){if(cpBet!==null)return;cpBet=c;document.querySelectorAll('.cbtn,.nbtn,.size-btns button').forEach(b=>b.classList.remove('sel'));el.classList.add('sel');document.getElementById('cpBet').disabled=false};
+window.confirmCP=async function(){if(cpBet===null)return;const amt=10*cpMult;if(coins<amt)return alert('कम balance!');coins-=amt;updBal();await updateDoc(doc(db,"users",user.uid),{coins});document.getElementById('cpInfo').textContent='Bet: '+cpBet+' (₹'+amt+')';document.getElementById('cpBet').disabled=true};
+async function cpResult(){const n=Math.floor(Math.random()*10);const c=n===0||n===5?'Violet':[1,3,7,9].includes(n)?'Green':'Red';const size=n>=5?'Big':'Small';cpHistory.unshift({p:cpPeriod,n,size,c});if(cpHistory.length>10)cpHistory.pop();showCPHistory();let win=false,wAmt=0;const betAmt=10*cpMult;if(cpBet===c){win=true;wAmt=c==='Violet'?Math.floor(betAmt*4.5):betAmt*2}else if(cpBet===size){win=true;wAmt=betAmt*2}else if(cpBet===n){win=true;wAmt=betAmt*9}if(win){coins+=wAmt;updBal();await updateDoc(doc(db,"users",user.uid),{coins});document.getElementById('cpInfo').textContent='🎉 '+n+' ('+c+') +₹'+wAmt;document.getElementById('cpInfo').className='gi w'}else{document.getElementById('cpInfo').textContent='हार। '+n+' ('+c+')';document.getElementById('cpInfo').className='gi l'}setTimeout(startCP,3000)}
+function showCPHistory(){const t=document.getElementById('cpHistory');t.innerHTML=cpHistory.map(h=>`<tr><td>${h.p}</td><td style="color:${h.c==='Green'?'#22c55e':h.c==='Red'?'#ef4444':'#a855f7'};font-weight:700">${h.n}</td><td>${h.size}</td><td><span class="dot ${h.c==='Green'?'g':h.c==='Red'?'r':'v'}"></span>${h.n===0||h.n===5?'<span class="dot v"></span>':''}</td></tr>`).join('')||'<tr><td colspan="4">No history</td></tr>'}
+
+// AVIATOR
+window.startAv=async function(){if(coins<20)return alert('कम!');coins-=20;updBal();await updateDoc(doc(db,"users",user.uid),{coins});avRun=true;avM=1;document.getElementById('avBet').style.display='none';document.getElementById('avCash').style.display='block';document.getElementById('avInfo').textContent='उड़ रहा...';const sky=document.querySelector('.sky'),plane=document.getElementById('plane');avIv=setInterval(()=>{avM+=0.04+Math.random()*0.06;document.getElementById('mult').textContent=avM.toFixed(2)+'x';const p=Math.min((avM-1)/12,1);plane.style.left=(15+p*(sky.offsetWidth-60))+'px';plane.style.bottom=(15+p*(sky.offsetHeight-60)*0.7)+'px';if(Math.random()<0.012+avM*0.002||avM>18)avCrash()},70)};
+window.cashOut=async function(){if(!avRun)return;clearInterval(avIv);avRun=false;const w=Math.floor(20*avM);coins+=w;updBal();await updateDoc(doc(db,"users",user.uid),{coins});document.getElementById('avInfo').textContent='🎉 +₹'+w;document.getElementById('avInfo').className='gi w';document.getElementById('avCash').style.display='none';document.getElementById('avBet').style.display='block';setTimeout(resetAv,2000)};
+function avCrash(){clearInterval(avIv);avRun=false;document.getElementById('mult').textContent='CRASH!';document.getElementById('mult').className='mult-display crash';document.getElementById('avInfo').textContent='💥 हार!';document.getElementById('avInfo').className='gi l';document.getElementById('avCash').style.display='none';document.getElementById('avBet').style.display='block';setTimeout(resetAv,2000)}
+function resetAv(){document.getElementById('mult').textContent='1.00x';document.getElementById('mult').className='mult-display';document.getElementById('plane').style.left='15px';document.getElementById('plane').style.bottom='15px';document.getElementById('avInfo').textContent='Bet लगाओ';document.getElementById('avInfo').className='gi'}
+
+// SLOTS
+const syms=['🍒','🍋','🍊','🍇','⭐','💎','7️⃣'];
+window.spin=async function(){if(coins<20)return alert('कम!');coins-=20;updBal();await updateDoc(doc(db,"users",user.uid),{coins});document.getElementById('slInfo').textContent='...';let c=0;const iv=setInterval(async()=>{['r1','r2','r3'].forEach(id=>document.getElementById(id).textContent=syms[Math.floor(Math.random()*syms.length)]);if(++c>18){clearInterval(iv);const s=[0,1,2].map(()=>syms[Math.floor(Math.random()*syms.length)]);document.getElementById('r1').textContent=s[0];document.getElementById('r2').textContent=s[1];document.getElementById('r3').textContent=s[2];if(s[0]===s[1]&&s[1]===s[2]){coins+=150;updBal();await updateDoc(doc(db,"users",user.uid),{coins});document.getElementById('slInfo').textContent='🎊 जैकपॉट! +₹150';document.getElementById('slInfo').className='gi w'}else if(s[0]===s[1]||s[1]===s[2]){coins+=40;updBal();await updateDoc(doc(db,"users",user.uid),{coins});document.getElementById('slInfo').textContent='✨ +₹40';document.getElementById('slInfo').className='gi w'}else{document.getElementById('slInfo').textContent='कोई मैच नहीं';document.getElementById('slInfo').className='gi l'}}},50)};
+
+onAuthStateChanged(auth,async(u)=>{if(u){user=u;const ds=await getDoc(doc(db,"users",u.uid));if(ds.exists())coins=ds.data().coins||0;else{await setDoc(doc(db,"users",u.uid),{email:u.email,coins:1000});coins=1000}updBal();document.getElementById('accEmail').textContent=u.email;document.getElementById('auth').classList.remove('on');document.getElementById('home').classList.add('on');document.getElementById('bnav').style.display='flex';drawGames()}else{user=null;coins=0;document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));document.getElementById('auth').classList.add('on');document.getElementById('bnav').style.display='none'}});
+</script>
+</body>
+</html>
