@@ -1,0 +1,1272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<title>Jai Club</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Poppins',sans-serif;background:#0a0a0f;color:#fff}
+.screen{display:none;min-height:100vh;padding-bottom:65px}
+.screen.on{display:block}
+.header{background:linear-gradient(135deg,#1a1a2e,#16213e);padding:10px 15px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #333}
+.logo{font-size:16px;font-weight:700;color:#ffd700}
+.bal{background:linear-gradient(90deg,#ffd700,#ff8c00);padding:5px 12px;border-radius:20px;font-size:12px;color:#000;font-weight:700;cursor:pointer}
+.back{cursor:pointer;font-size:20px;color:#ffd700}
+.banner{margin:8px;background:linear-gradient(135deg,#ff6b35,#ffd700);border-radius:10px;padding:12px;text-align:center}
+.banner h2{font-size:13px;color:#000}
+.cats{display:flex;gap:5px;padding:8px;overflow-x:auto}
+.cats::-webkit-scrollbar{display:none}
+.cat{padding:5px 12px;background:#1a1a2e;border-radius:15px;font-size:10px;cursor:pointer;white-space:nowrap;border:1px solid #333}
+.cat.on{background:linear-gradient(90deg,#ffd700,#ff8c00);color:#000;font-weight:600;border:none}
+.games{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:8px}
+.gc{background:linear-gradient(145deg,#1a1a2e,#0f0f1a);border-radius:12px;padding:12px 6px;text-align:center;cursor:pointer;border:1px solid #333}
+.gc:active{transform:scale(.95)}
+.gc .i{font-size:28px;margin-bottom:3px}
+.gc .n{font-size:9px;color:#aaa}
+.bnav{position:fixed;bottom:0;left:0;right:0;background:#0f0f1a;display:flex;border-top:1px solid #333;z-index:100}
+.bnav div{flex:1;text-align:center;padding:8px 0;cursor:pointer;font-size:10px;color:#666}
+.bnav div.on{color:#ffd700}
+.bnav .ic{font-size:18px;display:block}
+.auth-box{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:linear-gradient(180deg,#0a0a0f,#1a1a2e)}
+.auth-card{background:#1a1a2e;padding:25px;border-radius:16px;width:100%;max-width:320px;border:1px solid #333}
+.auth-card h2{text-align:center;font-size:22px;margin-bottom:16px;color:#ffd700}
+.auth-card input{width:100%;padding:12px;margin-bottom:10px;border:1px solid #333;border-radius:10px;background:#0f0f1a;color:#fff;font-size:14px}
+.auth-card button{width:100%;padding:12px;border:none;border-radius:10px;font-weight:700;cursor:pointer;font-size:14px}
+.btn-main{background:linear-gradient(90deg,#ffd700,#ff8c00);color:#000}
+.btn-link{background:transparent;color:#666;margin-top:6px}
+.msg{padding:10px;border-radius:8px;margin-bottom:10px;text-align:center;display:none;font-size:13px}
+.msg.err{background:#ef4444;display:block}
+.wcard{background:linear-gradient(135deg,#1a1a2e,#16213e);margin:10px;padding:18px;border-radius:12px;text-align:center;border:1px solid #ffd700}
+.wcard .amt{font-size:28px;font-weight:700;color:#ffd700;margin:6px 0}
+.btns{display:flex;gap:6px;padding:0 10px}
+.btn{flex:1;padding:12px;border:none;border-radius:8px;font-weight:600;cursor:pointer;font-size:12px}
+.btn-g{background:#22c55e;color:#fff}
+.btn-r{background:#ef4444;color:#fff}
+.btn-o{background:linear-gradient(90deg,#ffd700,#ff8c00);color:#000}
+.gi{text-align:center;padding:8px;color:#888;font-size:12px}
+.gi.w{color:#22c55e}
+.gi.l{color:#ef4444}
+.gb{width:calc(100% - 20px);margin:8px 10px;padding:14px;background:linear-gradient(90deg,#ffd700,#ff8c00);color:#000;border:none;border-radius:10px;font-weight:700;cursor:pointer;font-size:14px}
+.gb:disabled{background:#333;color:#666}
+.gb.cash{background:linear-gradient(90deg,#22c55e,#16a34a);color:#fff}
+.gb.wait{background:#374151;color:#fff}
+.hist{margin:10px;background:#1a1a2e;border-radius:10px;padding:10px}
+.hist h4{color:#ffd700;margin-bottom:6px;font-size:12px}
+.hi{padding:6px 0;border-bottom:1px solid #333;font-size:11px;display:flex;justify-content:space-between}
+.gc.disabled{opacity:0.4;pointer-events:none}
+.win-msg{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#22c55e;color:#000;padding:20px 30px;border-radius:16px;font-weight:700;font-size:18px;z-index:999;animation:pop .3s;box-shadow:0 10px 40px rgba(34,197,94,.5)}
+.lose-msg{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#ef4444;color:#fff;padding:20px 30px;border-radius:16px;font-weight:700;font-size:18px;z-index:999;animation:pop .3s;box-shadow:0 10px 40px rgba(239,68,68,.5)}
+.cp-timer-select{display:flex;gap:5px;padding:5px 8px}
+.cp-timer-select button{flex:1;padding:8px;border:none;border-radius:6px;background:#1a1a2e;color:#fff;font-size:11px;cursor:pointer}
+.cp-timer-select button.on{background:#ffd700;color:#000;font-weight:700}
+.result-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;z-index:200}
+.result-box{background:#1a1a2e;padding:25px;border-radius:16px;text-align:center;border:2px solid #ffd700;max-width:280px}
+.result-box h3{font-size:20px;margin-bottom:10px}
+.result-box.win h3{color:#22c55e}
+.result-box.lose h3{color:#ef4444}
+.admin-toggle{display:flex;justify-content:space-between;align-items:center;padding:10px;background:#1a1a2e;border-radius:8px;margin:4px 0}
+.admin-toggle input{width:40px;height:20px}
+
+/* AVIATOR/CRASH */
+.av-area{height:200px;margin:8px;border-radius:12px;background:radial-gradient(ellipse at center,#1a1a3e,#0a0a0f);position:relative;overflow:hidden;border:1px solid #333}
+.av-obj{position:absolute;font-size:40px;transition:all .08s;filter:drop-shadow(0 0 10px #ff6b35)}
+.av-mult{position:absolute;top:40%;left:50%;transform:translate(-50%,-50%);font-size:42px;font-weight:800;color:#fff;text-shadow:0 0 20px #fff}
+.av-mult.crash{color:#ef4444;text-shadow:0 0 20px #ef4444}
+.av-hist{display:flex;gap:4px;padding:6px 8px;overflow-x:auto}
+.av-hist::-webkit-scrollbar{display:none}
+.ah{padding:3px 8px;border-radius:5px;font-size:10px;font-weight:600}
+.ah.l{background:#22c55e}
+.ah.m{background:#f59e0b}
+.ah.h{background:#ef4444}
+.bet-row{display:flex;gap:6px;padding:6px 10px;align-items:center}
+.bet-input{flex:1;padding:10px;border:none;border-radius:8px;background:#1a1a2e;color:#fff;font-size:14px;text-align:center}
+.bet-btns{display:flex;gap:4px}
+.bet-btns button{padding:8px 12px;border:none;border-radius:6px;background:#1a1a2e;color:#fff;font-size:11px;cursor:pointer}
+
+/* CARDS */
+.card{width:55px;height:78px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;font-size:24px;margin:2px;box-shadow:0 3px 8px rgba(0,0,0,.3)}
+.card.back{background:linear-gradient(145deg,#1e40af,#3b82f6);color:#fff}
+.card.red{background:linear-gradient(145deg,#fff,#fee2e2);color:#ef4444}
+.card.black{background:linear-gradient(145deg,#fff,#e2e8f0);color:#1e293b}
+.card.spinning{animation:cardSpin .15s linear infinite}
+@keyframes cardSpin{0%{transform:rotateY(0)}50%{transform:rotateY(180deg)}100%{transform:rotateY(360deg)}}
+
+/* DICE */
+.dice{width:70px;height:70px;background:linear-gradient(145deg,#fff,#e2e8f0);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:42px;margin:15px auto;box-shadow:0 6px 15px rgba(0,0,0,.3)}
+.dice.spinning{animation:diceSpin .25s linear infinite}
+@keyframes diceSpin{0%{transform:rotate(0)}25%{transform:rotate(90deg)}50%{transform:rotate(180deg)}75%{transform:rotate(270deg)}100%{transform:rotate(360deg)}}
+
+/* COIN */
+.coin{width:90px;height:90px;border-radius:50%;margin:15px auto;display:flex;align-items:center;justify-content:center;font-size:36px;font-weight:700;box-shadow:0 6px 20px rgba(0,0,0,.4)}
+.coin.heads{background:linear-gradient(145deg,#f59e0b,#d97706);color:#000}
+.coin.tails{background:linear-gradient(145deg,#6b7280,#4b5563);color:#fff}
+.coin.flipping{animation:coinFlip .2s linear infinite}
+@keyframes coinFlip{0%{transform:rotateY(0)}50%{transform:rotateY(180deg)}100%{transform:rotateY(360deg)}}
+
+/* COLOR PRED */
+.cp-box{background:#1a1a2e;margin:8px;padding:10px;border-radius:10px;display:flex;justify-content:space-between}
+.cp-timer-box{text-align:center;flex:1}
+.cp-timer{font-size:28px;font-weight:700;color:#ffd700}
+.cp-label{font-size:9px;color:#888;margin-bottom:2px}
+.cp-colors{display:flex;gap:5px;padding:6px 8px}
+.cp-btn{flex:1;padding:12px 4px;border:none;border-radius:6px;font-weight:700;cursor:pointer;font-size:11px;color:#fff}
+.cp-btn.g{background:#22c55e}
+.cp-btn.v{background:#a855f7}
+.cp-btn.r{background:#ef4444}
+.cp-btn.sel{box-shadow:0 0 0 2px #ffd700}
+.cp-nums{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;padding:0 8px}
+.cp-num{aspect-ratio:1;border:none;border-radius:50%;font-size:16px;font-weight:700;cursor:pointer;color:#fff}
+.cp-num.g{background:#22c55e}
+.cp-num.r{background:#ef4444}
+.cp-num.v{background:#a855f7}
+.cp-num.sel{box-shadow:0 0 0 2px #ffd700}
+.cp-size{display:flex;margin:8px}
+.cp-size button{flex:1;padding:12px;border:none;font-weight:700;cursor:pointer;font-size:12px}
+.cp-size .big{background:#f59e0b;border-radius:6px 0 0 6px;color:#000}
+.cp-size .small{background:#3b82f6;border-radius:0 6px 6px 0;color:#fff}
+.cp-size button.sel{box-shadow:inset 0 0 0 2px #fff}
+.cp-hist{margin:8px;background:#1a1a2e;border-radius:8px;overflow:hidden}
+.cp-hist table{width:100%;border-collapse:collapse}
+.cp-hist th,.cp-hist td{padding:6px 3px;text-align:center;font-size:10px}
+.cp-hist th{background:#0f0f1a;color:#888}
+.num-ball{width:18px;height:18px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+
+/* DT */
+.dt-area{background:linear-gradient(145deg,#0d5c3d,#0a3d28);margin:8px;padding:10px;border-radius:10px;border:2px solid #8b4513}
+.dt-cards{display:flex;justify-content:space-around;margin:6px 0}
+.dt-side{text-align:center}
+.dt-side h3{font-size:11px;margin-bottom:4px}
+.dt-bets{display:flex;gap:5px;margin-top:8px}
+.dt-bet{flex:1;padding:10px;border:none;border-radius:6px;font-weight:700;cursor:pointer;font-size:10px}
+.dt-bet.d{background:#ef4444;color:#fff}
+.dt-bet.t{background:#22c55e;color:#fff}
+.dt-bet.ti{background:#f59e0b;color:#000}
+.dt-bet.sel{box-shadow:0 0 0 2px #fff}
+
+/* SLOTS */
+.slot-area{background:#1a1a2e;margin:8px;padding:10px;border-radius:10px;border:2px solid #ffd700}
+.slot-reels{display:flex;justify-content:center;gap:6px;margin:6px 0}
+.slot-reel{width:55px;height:68px;background:#0f0f1a;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:28px;border:2px solid #333}
+.slot-reel.spin{animation:slotSpin .06s linear infinite}
+@keyframes slotSpin{0%{transform:translateY(-2px)}50%{transform:translateY(2px)}100%{transform:translateY(-2px)}}
+
+.inp{width:100%;padding:10px;border:none;border-radius:8px;background:#1a1a2e;color:#fff;margin-bottom:8px;font-size:13px}
+</style>
+</head>
+<body>
+
+<div id="auth" class="screen on">
+<div class="auth-box"><div class="auth-card">
+<h2 id="authTitle">Login</h2>
+<div class="msg" id="authMsg"></div>
+<input type="email" id="email" placeholder="Email">
+<input type="password" id="pass" placeholder="Password">
+<button class="btn-main" id="authBtn" onclick="doAuth()">Login</button>
+<button class="btn-link" onclick="toggleAuth()">Don't have account? Signup</button>
+</div></div>
+</div>
+
+<div id="home" class="screen">
+<div class="header"><div class="logo">🎮 JAI CLUB</div><div class="bal" onclick="show('wallet')">₹<span id="hBal">0</span></div></div>
+<div class="banner"><h2>🎁 Deposit ₹100+ Get ₹50 Bonus</h2></div>
+<div class="cats">
+<div class="cat on" onclick="setCat('all',this)">🔥 All</div>
+<div class="cat" onclick="setCat('crash',this)">🚀 Crash</div>
+<div class="cat" onclick="setCat('cards',this)">🃏 Cards</div>
+<div class="cat" onclick="setCat('slots',this)">🎰 Slots</div>
+<div class="cat" onclick="setCat('mini',this)">🎮 Mini</div>
+</div>
+<div class="games" id="gamesGrid"></div>
+<div id="adminBtn" style="display:none;padding:0 8px"><button class="gb" onclick="show('admin');loadAdmin()" style="background:#333;color:#fff">⚙️ Admin</button></div>
+</div>
+
+<div id="wallet" class="screen">
+<div class="header"><div class="back" onclick="show('home')">←</div><div class="logo">💰 Wallet</div><div></div></div>
+<div class="wcard"><div style="font-size:11px;opacity:.8">Balance</div><div class="amt">₹<span id="wBal">0</span></div></div>
+<div class="btns">
+<button class="btn btn-g" onclick="showDep()">💳 Deposit</button>
+<button class="btn btn-r" onclick="showWit()">💸 Withdraw</button>
+</div>
+<div id="depBox" style="display:none;padding:10px">
+<input type="number" class="inp" id="depAmt" placeholder="Enter amount">
+<button class="gb" onclick="doDep()">Deposit Now</button>
+<div class="gi" style="font-size:10px">₹100+ = ₹50 bonus</div>
+</div>
+<div id="witBox" style="display:none;padding:10px">
+<input type="number" class="inp" id="witAmt" placeholder="Enter amount">
+<button class="gb" onclick="doWit()" style="background:#ef4444;color:#fff">Withdraw Now</button>
+</div>
+<div class="hist"><h4>History</h4><div id="histList"><div class="empty">No transactions</div></div></div>
+</div>
+
+<!-- AVIATOR -->
+<div id="aviator" class="screen">
+<div class="header"><div class="back" onclick="show('home')">←</div><div class="logo">✈️ 3D AVIATOR</div><div class="bal">₹<span class="gBal">0</span></div></div>
+<div class="av-hist" id="avHist"></div>
+<div class="av-area" id="av3dArea" style="height:220px;position:relative;background:radial-gradient(ellipse at center,#1a1a3e,#0a0a0f)">
+  <div id="av3d" style="width:100%;height:200px;position:absolute;top:0;left:0"></div>
+  <div class="av-mult" id="avMult" style="position:absolute;top:40%;left:50%;transform:translate(-50%,-50%);z-index:10">1.00x</div>
+</div>
+<div class="gi" id="avInfo">Place your bet</div>
+<div class="bet-row">
+<input type="number" class="bet-input" id="avBetAmt" value="20" min="10">
+<div class="bet-btns">
+<button onclick="setAvBet(10)">10</button>
+<button onclick="setAvBet(20)">20</button>
+<button onclick="setAvBet(50)">50</button>
+<button onclick="setAvBet(100)">100</button>
+</div>
+</div>
+<button class="gb" id="avBet" onclick="startAv()">BET</button>
+<button class="gb cash" id="avCash" onclick="cashAv()" style="display:none">CASH OUT <span id="avCashAmt">0</span></button>
+</div>
+
+<!-- CRASH -->
+<div id="crash" class="screen">
+<div class="header"><div class="back" onclick="show('home')">←</div><div class="logo">🚀 3D CRASH</div><div class="bal">₹<span class="gBal">0</span></div></div>
+<div class="av-hist" id="crashHist"></div>
+<div class="av-area" style="height:220px;position:relative;background:radial-gradient(ellipse at center,#1a0a2e,#0a0a0f)">
+  <div id="crash3d" style="width:100%;height:200px;position:absolute;top:0;left:0"></div>
+  <div class="av-mult" id="crashMult" style="position:absolute;top:40%;left:50%;transform:translate(-50%,-50%);z-index:10">1.00x</div>
+</div>
+<div class="gi" id="crashInfo">Place your bet</div>
+<div class="bet-row">
+<input type="number" class="bet-input" id="crashBetAmt" value="20" min="10">
+<div class="bet-btns">
+<button onclick="setCrashBet(10)">10</button>
+<button onclick="setCrashBet(20)">20</button>
+<button onclick="setCrashBet(50)">50</button>
+<button onclick="setCrashBet(100)">100</button>
+</div>
+</div>
+<button class="gb" id="crashBet" onclick="startCrash()">BET</button>
+<button class="gb cash" id="crashCash" onclick="cashCrash()" style="display:none">CASH OUT <span id="crashCashAmt">0</span></button>
+</div>
+
+<!-- COLOR PRED -->
+<div id="colorpred" class="screen">
+<div class="header"><div class="back" onclick="show('home')">←</div><div class="logo">🎨 COLOR</div><div class="bal">₹<span class="gBal">0</span></div></div>
+<div class="cp-timer-select">
+<button class="on" onclick="setCPTimer(30,this)">30s</button>
+<button onclick="setCPTimer(60,this)">1min</button>
+<button onclick="setCPTimer(120,this)">2min</button>
+</div>
+<div class="cp-box">
+<div class="cp-timer-box"><div class="cp-label">TIME</div><div class="cp-timer" id="cpTimer">00:30</div></div>
+<div class="cp-timer-box"><div class="cp-label">PERIOD</div><div class="cp-timer" style="font-size:18px" id="cpPeriod">1</div></div>
+</div>
+<div class="cp-colors">
+<button class="cp-btn g" onclick="betCP('Green',this)">GREEN</button>
+<button class="cp-btn v" onclick="betCP('Violet',this)">VIOLET</button>
+<button class="cp-btn r" onclick="betCP('Red',this)">RED</button>
+</div>
+<div class="cp-nums" id="cpNums"></div>
+<div class="cp-size"><button class="big" onclick="betCP('Big',this)">BIG</button><button class="small" onclick="betCP('Small',this)">SMALL</button></div>
+<div class="gi" id="cpInfo">Select bet</div>
+<div class="bet-row">
+<input type="number" class="bet-input" id="cpBetAmt" value="10" min="10">
+</div>
+<button class="gb" id="cpBet" onclick="playCP()" disabled>CONFIRM</button>
+<div class="cp-hist"><table><thead><tr><th>Period</th><th>Num</th><th>B/S</th><th>Color</th></tr></thead><tbody id="cpHist"></tbody></table></div>
+</div>
+
+<!-- DRAGON TIGER -->
+<div id="dragontiger" class="screen">
+<div class="header"><div class="back" onclick="show('home')">←</div><div class="logo">🐉 DRAGON TIGER</div><div class="bal">₹<span class="gBal">0</span></div></div>
+<div class="dt-area">
+<div class="dt-cards">
+<div class="dt-side"><h3 style="color:#ef4444">🐉 Dragon</h3><div class="card back" id="dtD">🂠</div></div>
+<div class="dt-side"><h3 style="color:#f59e0b">🐅 Tiger</h3><div class="card back" id="dtT">🂠</div></div>
+</div>
+<div class="gi" id="dtInfo">Select</div>
+<div class="dt-bets">
+<button class="dt-bet d" onclick="betDT('Dragon',this)">Dragon 2x</button>
+<button class="dt-bet t" onclick="betDT('Tie',this)">Tie 8x</button>
+<button class="dt-bet ti" onclick="betDT('Tiger',this)">Tiger 2x</button>
+</div>
+</div>
+<div class="bet-row">
+<input type="number" class="bet-input" id="dtBetAmt" value="10" min="10">
+<div class="bet-btns">
+<button onclick="setDTAmt(10)">10</button>
+<button onclick="setDTAmt(20)">20</button>
+<button onclick="setDTAmt(50)">50</button>
+</div>
+</div>
+<button class="gb" id="dtPlay" onclick="playDT()" disabled>PLAY</button>
+</div>
+
+<!-- SLOTS -->
+<div id="slots" class="screen">
+<div class="header"><div class="back" onclick="show('home')">←</div><div class="logo">🎰 SLOTS</div><div class="bal">₹<span class="gBal">0</span></div></div>
+<div class="slot-area">
+<div class="slot-reels"><div class="slot-reel" id="s1">🍒</div><div class="slot-reel" id="s2">🍋</div><div class="slot-reel" id="s3">🍊</div></div>
+<div class="gi" id="slotInfo">Spin</div>
+</div>
+<div class="bet-row">
+<input type="number" class="bet-input" id="slotBetAmt" value="20" min="10">
+<div class="bet-btns">
+<button onclick="setSlotAmt(10)">10</button>
+<button onclick="setSlotAmt(20)">20</button>
+<button onclick="setSlotAmt(50)">50</button>
+</div>
+</div>
+<button class="gb" id="slotBtn" onclick="spin()">SPIN</button>
+</div>
+
+<!-- DICE -->
+<div id="dice" class="screen">
+<div class="header"><div class="back" onclick="show('home')">←</div><div class="logo">🎲 3D DICE</div><div class="bal">₹<span class="gBal">0</span></div></div>
+<div style="text-align:center;padding:10px">
+<div id="dice3d" style="width:200px;height:200px;margin:10px auto;border-radius:12px;overflow:hidden;background:#111"></div>
+<div class="gi" id="diceInfo">High or Low</div>
+</div>
+<div class="bet-row">
+<input type="number" class="bet-input" id="diceBetAmt" value="10" min="10">
+</div>
+<div class="btns"><button class="btn btn-g" onclick="playDice('High')">HIGH</button><button class="btn btn-r" onclick="playDice('Low')">LOW</button></div>
+</div>
+
+<!-- COIN -->
+<div id="coin" class="screen">
+<div class="header"><div class="back" onclick="show('home')">←</div><div class="logo">🪙 COIN</div><div class="bal">₹<span class="gBal">0</span></div></div>
+<div style="text-align:center;padding:10px"><div class="coin heads" id="coinBox">H</div><div class="gi" id="coinInfo">Heads or Tails</div></div>
+<div class="bet-row">
+<input type="number" class="bet-input" id="coinBetAmt" value="10" min="10">
+</div>
+<div class="btns"><button class="btn btn-o" onclick="playCoin('Heads')">HEADS</button><button class="btn" style="background:#6b7280;color:#fff" onclick="playCoin('Tails')">TAILS</button></div>
+</div>
+
+<!-- TEEN PATTI -->
+<div id="teenpatti" class="screen">
+<div class="header"><div class="back" onclick="show('home')">←</div><div class="logo">🃏 TEEN PATTI</div><div class="bal">₹<span class="gBal">0</span></div></div>
+<div style="text-align:center;padding:10px">
+<div class="gi">Your Cards</div>
+<div id="tpCards" style="margin:8px 0"><span class="card back">🂠</span><span class="card back">🂠</span><span class="card back">🂠</span></div>
+<div class="gi" id="tpInfo">Play</div>
+</div>
+<div class="bet-row">
+<input type="number" class="bet-input" id="tpBetAmt" value="20" min="10">
+</div>
+<button class="gb" id="tpBtn" onclick="playTP()">PLAY</button>
+</div>
+
+<!-- ANDAR BAHAR -->
+<div id="andarbahar" class="screen">
+<div class="header"><div class="back" onclick="show('home')">←</div><div class="logo">🎴 ANDAR BAHAR</div><div class="bal">₹<span class="gBal">0</span></div></div>
+<div style="text-align:center;padding:8px">
+<div class="gi">Middle</div>
+<div id="abMid" style="margin:5px 0"><span class="card back">🂠</span></div>
+<div style="display:flex;justify-content:space-around">
+<div><div class="gi">Andar</div><div id="abA"><span class="card back">🂠</span></div></div>
+<div><div class="gi">Bahar</div><div id="abB"><span class="card back">🂠</span></div></div>
+</div>
+<div class="gi" id="abInfo">Choose</div>
+</div>
+<div class="bet-row">
+<input type="number" class="bet-input" id="abBetAmt" value="10" min="10">
+</div>
+<div class="btns"><button class="btn btn-g" onclick="playAB('Andar')">ANDAR</button><button class="btn btn-r" onclick="playAB('Bahar')">BAHAR</button></div>
+</div>
+
+<!-- K3 -->
+<div id="k3" class="screen">
+<div class="header"><div class="back" onclick="show('home')">←</div><div class="logo">🎯 K3</div><div class="bal">₹<span class="gBal">0</span></div></div>
+<div style="text-align:center;padding:10px">
+<div style="display:flex;justify-content:center;gap:8px;margin:10px 0">
+<div class="dice" style="width:55px;height:55px;font-size:32px" id="k3d1">🎲</div>
+<div class="dice" style="width:55px;height:55px;font-size:32px" id="k3d2">🎲</div>
+<div class="dice" style="width:55px;height:55px;font-size:32px" id="k3d3">🎲</div>
+</div>
+<div class="gi" id="k3Info">Sum: -</div>
+</div>
+<div class="bet-row">
+<input type="number" class="bet-input" id="k3BetAmt" value="10" min="10">
+</div>
+<div class="btns"><button class="btn btn-g" onclick="playK3('Big')">BIG (11-18)</button><button class="btn btn-r" onclick="playK3('Small')">SMALL (3-10)</button></div>
+</div>
+
+<!-- HI-LO -->
+<div id="hilo" class="screen">
+<div class="header"><div class="back" onclick="show('home')">←</div><div class="logo">📈 HI-LO</div><div class="bal">₹<span class="gBal">0</span></div></div>
+<div style="text-align:center;padding:10px">
+<div style="font-size:60px;margin:10px 0" id="hiloCard">🂡</div>
+<div class="gi" id="hiloInfo">Higher or Lower</div>
+</div>
+<div class="bet-row">
+<input type="number" class="bet-input" id="hiloBetAmt" value="10" min="10">
+</div>
+<div class="btns"><button class="btn btn-g" onclick="playHilo('Higher')">HIGHER ⬆️</button><button class="btn btn-r" onclick="playHilo('Lower')">LOWER ⬇️</button></div>
+</div>
+
+<!-- PLINKO -->
+<div id="plinko" class="screen">
+<div class="header"><div class="back" onclick="show('home')">←</div><div class="logo">🔴 PLINKO</div><div class="bal">₹<span class="gBal">0</span></div></div>
+<div style="text-align:center;padding:10px">
+<div style="height:150px;background:linear-gradient(180deg,#1a1a2e,#0f0f1a);border-radius:10px;margin:8px 0;position:relative;overflow:hidden">
+<div style="position:absolute;font-size:24px;transition:all .5s" id="plinkoBall">🔴</div>
+</div>
+<div class="gi" id="plinkoInfo">Drop the ball</div>
+<div style="display:flex;gap:4px;justify-content:center;margin:8px 0">
+<span style="background:#ef4444;padding:6px 10px;border-radius:6px;font-size:10px">0.5x</span>
+<span style="background:#f59e0b;padding:6px 10px;border-radius:6px;font-size:10px">1x</span>
+<span style="background:#22c55e;padding:6px 10px;border-radius:6px;font-size:10px">2x</span>
+<span style="background:#3b82f6;padding:6px 10px;border-radius:6px;font-size:10px">5x</span>
+<span style="background:#a855f7;padding:6px 10px;border-radius:6px;font-size:10px">10x</span>
+</div>
+</div>
+<div class="bet-row">
+<input type="number" class="bet-input" id="plinkoBetAmt" value="10" min="10">
+</div>
+<button class="gb" id="plinkoBtn" onclick="playPlinko()">DROP</button>
+</div>
+
+<!-- MINES -->
+<div id="mines" class="screen">
+<div class="header"><div class="back" onclick="show('home')">←</div><div class="logo">💣 MINES</div><div class="bal">₹<span class="gBal">0</span></div></div>
+<div style="padding:8px">
+<div class="gi" id="minesInfo">Find gems, avoid bombs</div>
+<div id="minesGrid" style="display:grid;grid-template-columns:repeat(5,1fr);gap:4px;margin:8px 0"></div>
+</div>
+<div class="bet-row">
+<input type="number" class="bet-input" id="minesBetAmt" value="10" min="10">
+</div>
+<button class="gb" id="minesBtn" onclick="startMines()">START</button>
+</div>
+
+<!-- WHEEL -->
+<div id="wheel" class="screen">
+<div class="header"><div class="back" onclick="show('home')">←</div><div class="logo">🎡 WHEEL</div><div class="bal">₹<span class="gBal">0</span></div></div>
+<div style="text-align:center;padding:10px">
+<div style="font-size:80px;margin:10px 0" id="wheelIcon">🎡</div>
+<div class="gi" id="wheelInfo">Spin the wheel</div>
+</div>
+<div class="bet-row">
+<input type="number" class="bet-input" id="wheelBetAmt" value="10" min="10">
+</div>
+<button class="gb" id="wheelBtn" onclick="spinWheel()">SPIN</button>
+</div>
+
+<!-- ROULETTE -->
+<div id="roulette" class="screen">
+<div class="header"><div class="back" onclick="show('home')">←</div><div class="logo">🎰 ROULETTE</div><div class="bal">₹<span class="gBal">0</span></div></div>
+<div style="text-align:center;padding:10px">
+<div style="font-size:70px;margin:10px 0" id="rouletteNum">0</div>
+<div class="gi" id="rouletteInfo">Red, Black or Green</div>
+</div>
+<div class="bet-row">
+<input type="number" class="bet-input" id="rouletteBetAmt" value="10" min="10">
+</div>
+<div class="btns">
+<button class="btn btn-r" onclick="playRoulette('Red')">RED</button>
+<button class="btn" style="background:#1e293b;color:#fff" onclick="playRoulette('Black')">BLACK</button>
+<button class="btn btn-g" onclick="playRoulette('Green')">GREEN</button>
+</div>
+</div>
+
+<!-- ROULETTE -->
+<div id="roulette" class="screen">
+<div class="header"><div class="back" onclick="show('home')">←</div><div class="logo">🎰 ROULETTE</div><div class="bal">₹<span class="gBal">0</span></div></div>
+<div style="text-align:center;padding:10px">
+<div style="font-size:70px;margin:10px 0" id="rouletteNum">0</div>
+<div class="gi" id="rouletteInfo">Red, Black or Green</div>
+</div>
+<div class="bet-row">
+<input type="number" class="bet-input" id="rouletteBetAmt" value="10" min="10">
+</div>
+<div class="btns">
+<button class="btn btn-r" onclick="playRoulette('Red')">RED</button>
+<button class="btn" style="background:#1e293b;color:#fff" onclick="playRoulette('Black')">BLACK</button>
+<button class="btn btn-g" onclick="playRoulette('Green')">GREEN</button>
+</div>
+</div>
+
+<!-- BACCARAT -->
+<div id="baccarat" class="screen">
+<div class="header"><div class="back" onclick="show('home')">←</div><div class="logo">🃏 BACCARAT</div><div class="bal">₹<span class="gBal">0</span></div></div>
+<div class="gi" id="bacInfo">Player or Banker</div>
+<div class="bet-row"><input type="number" class="bet-input" id="bacBetAmt" value="10" min="10"></div>
+<div class="btns"><button class="btn btn-g" onclick="playBac('Player')">PLAYER</button><button class="btn btn-r" onclick="playBac('Banker')">BANKER</button></div>
+</div>
+
+<!-- BLACKJACK -->
+<div id="blackjack" class="screen">
+<div class="header"><div class="back" onclick="show('home')">←</div><div class="logo">🂡 BLACKJACK</div><div class="bal">₹<span class="gBal">0</span></div></div>
+<div class="gi" id="bjInfo">Hit or Stand</div>
+<div class="bet-row"><input type="number" class="bet-input" id="bjBetAmt" value="20" min="10"></div>
+<button class="gb" onclick="playBJ()">PLAY</button>
+</div>
+
+<!-- KENO -->
+<div id="keno" class="screen">
+<div class="header"><div class="back" onclick="show('home')">←</div><div class="logo">🔢 KENO</div><div class="bal">₹<span class="gBal">0</span></div></div>
+<div class="gi" id="kenoInfo">Pick numbers</div>
+<div class="bet-row"><input type="number" class="bet-input" id="kenoBetAmt" value="10" min="10"></div>
+<button class="gb" onclick="playKeno()">PLAY</button>
+</div>
+
+<!-- LOTTERY -->
+<div id="lottery" class="screen">
+<div class="header"><div class="back" onclick="show('home')">←</div><div class="logo">🎫 LOTTERY</div><div class="bal">₹<span class="gBal">0</span></div></div>
+<div class="gi" id="lotInfo">Buy ticket</div>
+<div class="bet-row"><input type="number" class="bet-input" id="lotBetAmt" value="10" min="10"></div>
+<button class="gb" onclick="playLottery()">BUY</button>
+</div>
+
+<!-- POKER -->
+<div id="poker" class="screen">
+<div class="header"><div class="back" onclick="show('home')">←</div><div class="logo">♠️ POKER</div><div class="bal">₹<span class="gBal">0</span></div></div>
+<div class="gi" id="pokerInfo">Play hand</div>
+<div class="bet-row"><input type="number" class="bet-input" id="pokerBetAmt" value="20" min="10"></div>
+<button class="gb" onclick="playPoker()">PLAY</button>
+</div>
+
+<!-- BACCARAT -->
+<div id="baccarat" class="screen">
+<div class="header"><div class="back" onclick="show('home')">←</div><div class="logo">🃏 BACCARAT</div><div class="bal">₹<span class="gBal">0</span></div></div>
+<div style="text-align:center;padding:15px">
+<div class="gi">Player vs Banker</div>
+<div style="display:flex;justify-content:space-around;margin:15px 0">
+<div><div class="gi">Player</div><div id="bacP" class="card back">🂠</div></div>
+<div><div class="gi">Banker</div><div id="bacB" class="card back">🂠</div></div>
+</div>
+<div class="gi" id="bacInfo">Choose side</div>
+</div>
+<div class="bet-row"><input type="number" class="bet-input" id="bacBetAmt" value="10" min="10"></div>
+<div class="btns"><button class="btn btn-g" onclick="playBac('Player')">PLAYER 2x</button><button class="btn btn-r" onclick="playBac('Banker')">BANKER 1.95x</button></div>
+</div>
+
+<!-- BLACKJACK -->
+<div id="blackjack" class="screen">
+<div class="header"><div class="back" onclick="show('home')">←</div><div class="logo">🂡 BLACKJACK</div><div class="bal">₹<span class="gBal">0</span></div></div>
+<div style="text-align:center;padding:15px">
+<div class="gi">Your Hand</div>
+<div id="bjCards" style="margin:10px 0"><span class="card back">🂠</span><span class="card back">🂠</span></div>
+<div class="gi" id="bjInfo">Play to see</div>
+</div>
+<div class="bet-row"><input type="number" class="bet-input" id="bjBetAmt" value="20" min="10"></div>
+<button class="gb" id="bjBtn" onclick="playBJ()">PLAY</button>
+</div>
+
+<!-- KENO -->
+<div id="keno" class="screen">
+<div class="header"><div class="back" onclick="show('home')">←</div><div class="logo">🔢 KENO</div><div class="bal">₹<span class="gBal">0</span></div></div>
+<div style="text-align:center;padding:15px">
+<div class="gi" id="kenoInfo">Pick 5 numbers</div>
+<div id="kenoGrid" style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin:10px 0"></div>
+</div>
+<div class="bet-row"><input type="number" class="bet-input" id="kenoBetAmt" value="10" min="10"></div>
+<button class="gb" onclick="playKeno()">PLAY</button>
+</div>
+
+<!-- LOTTERY -->
+<div id="lottery" class="screen">
+<div class="header"><div class="back" onclick="show('home')">←</div><div class="logo">🎫 LOTTERY</div><div class="bal">₹<span class="gBal">0</span></div></div>
+<div style="text-align:center;padding:20px">
+<div style="font-size:60px">🎫</div>
+<div class="gi" id="lotInfo">Buy a ticket</div>
+<div id="lotNum" style="font-size:28px;margin:15px 0;color:#ffd700">------</div>
+</div>
+<div class="bet-row"><input type="number" class="bet-input" id="lotBetAmt" value="10" min="10"></div>
+<button class="gb" onclick="playLottery()">BUY TICKET</button>
+</div>
+
+<!-- POKER -->
+<div id="poker" class="screen">
+<div class="header"><div class="back" onclick="show('home')">←</div><div class="logo">♠️ POKER</div><div class="bal">₹<span class="gBal">0</span></div></div>
+<div style="text-align:center;padding:15px">
+<div class="gi">Your Hand</div>
+<div id="pokerCards" style="margin:10px 0"><span class="card back">🂠</span><span class="card back">🂠</span><span class="card back">🂠</span><span class="card back">🂠</span><span class="card back">🂠</span></div>
+<div class="gi" id="pokerInfo">Play to see</div>
+</div>
+<div class="bet-row"><input type="number" class="bet-input" id="pokerBetAmt" value="20" min="10"></div>
+<button class="gb" onclick="playPoker()">PLAY</button>
+</div>
+
+<!-- ADMIN -->
+<div id="admin" class="screen">
+<div class="header"><div class="back" onclick="show('home')">←</div><div class="logo">⚙️ ADMIN PANEL</div><div></div></div>
+<div style="padding:10px">
+<div class="wcard" style="margin:0 0 10px"><div style="font-size:11px">Total Users</div><div class="amt" id="adminTotal">0</div></div>
+<div class="btns" style="padding:0 0 10px">
+<button class="btn" style="background:#3b82f6;color:#fff" onclick="loadAdmin('users')">👥 Users</button>
+<button class="btn" style="background:#22c55e;color:#fff" onclick="loadAdmin('deposits')">💳 Deposits</button>
+<button class="btn" style="background:#ef4444;color:#fff" onclick="loadAdmin('withdraws')">💸 Withdraws</button>
+<button class="btn" style="background:#a855f7;color:#fff" onclick="loadAdmin('games')">🎮 Games</button>
+</div>
+<div class="hist" style="margin:0"><h4 id="adminTitle">Users</h4><div id="adminList"><div class="empty">Click to load</div></div></div>
+</div>
+</div>
+
+<div id="account" class="screen">
+<div class="header"><div class="logo">👤 ACCOUNT</div></div>
+<div style="padding:20px;text-align:center">
+<p id="accEmail" style="color:#888;font-size:12px"></p>
+<p style="font-size:26px;color:#ffd700;margin:10px 0">₹<span id="accBal">0</span></p>
+<button class="gb" id="adminBtnAcc" onclick="show('admin');loadAdmin()" style="display:none;background:#333;color:#fff">⚙️ Admin</button>
+<button class="gb" onclick="logout()">LOGOUT</button>
+</div>
+</div>
+
+<div class="bnav" id="bnav" style="display:none">
+<div class="on" onclick="show('home')" id="nH"><span class="ic">🏠</span>Home</div>
+<div onclick="show('wallet')" id="nW"><span class="ic">💰</span>Wallet</div>
+<div onclick="show('account')" id="nA"><span class="ic">👤</span>Me</div>
+</div>
+
+<script>
+const API = 'https://jai-club-backend.onrender.com';
+let token = localStorage.getItem('token');
+let user = JSON.parse(localStorage.getItem('user') || 'null');
+let isLogin = true, cpBet = null, cpPeriod = 1, cpHistory = [], cpTime = 30, cpInterval = null;
+let avRun = false, avM = 1, avIv = null, avHist = [], avWait = false;
+let crashRun = false, crashM = 1, crashIv = null, crashHist = [], crashWait = false;
+let dtBet = null, hiloVal = 7, minesActive = false, minesBombs = [];
+let transactions = JSON.parse(localStorage.getItem('transactions') || '[]');
+
+const redCards = ['🂡','🂢','🂣','🂤','🂥','🂦','🂧','🂨','🂩','🂪','🂫','🂭','🂮','🃁','🃂','🃃','🃄','🃅','🃆','🃇','🃈','🃉','🃊','🃋','🃍','🃎'];
+const blackCards = ['🂱','🂲','🂳','🂴','🂵','🂶','🂷','🂸','🂹','🂺','🂻','🂽','🂾','🃑','🃒','🃓','🃔','🃕','🃖','🃗','🃘','🃙','🃚','🃛','🃝','🃞'];
+const allCards = [...redCards, ...blackCards];
+const syms = ['🍒','🍋','🍊','🍇','⭐','💎','7️⃣'];
+const diceFaces = ['⚀','⚁','⚂','⚃','⚄','⚅'];
+
+const GAMES = {
+  all:[{n:'Aviator',i:'✈️',g:'aviator'},{n:'Crash',i:'🚀',g:'crash'},{n:'Color',i:'🎨',g:'colorpred'},{n:'Dragon Tiger',i:'🐉',g:'dragontiger'},{n:'Slots',i:'🎰',g:'slots'},{n:'Teen Patti',i:'🃏',g:'teenpatti'},{n:'Andar Bahar',i:'🎴',g:'andarbahar'},{n:'Dice',i:'🎲',g:'dice'},{n:'Coin',i:'🪙',g:'coin'},{n:'K3',i:'🎯',g:'k3'},{n:'Hi-Lo',i:'📈',g:'hilo'},{n:'Plinko',i:'🔴',g:'plinko'},{n:'Mines',i:'💣',g:'mines'},{n:'Wheel',i:'🎡',g:'wheel'},{n:'Roulette',i:'🎰',g:'roulette'},{n:'Baccarat',i:'🃏',g:'baccarat'},{n:'Blackjack',i:'🂡',g:'blackjack'},{n:'Keno',i:'🔢',g:'keno'},{n:'Lottery',i:'🎫',g:'lottery'},{n:'Poker',i:'♠️',g:'poker'}],
+  crash:[{n:'Aviator',i:'✈️',g:'aviator'},{n:'Crash',i:'🚀',g:'crash'}],
+  cards:[{n:'Dragon Tiger',i:'🐉',g:'dragontiger'},{n:'Teen Patti',i:'🃏',g:'teenpatti'},{n:'Andar Bahar',i:'🎴',g:'andarbahar'}],
+  slots:[{n:'Slots',i:'🎰',g:'slots'},{n:'Wheel',i:'🎡',g:'wheel'},{n:'Roulette',i:'🎰',g:'roulette'}],
+  mini:[{n:'Dice',i:'🎲',g:'dice'},{n:'Coin',i:'🪙',g:'coin'},{n:'K3',i:'🎯',g:'k3'},{n:'Hi-Lo',i:'📈',g:'hilo'},{n:'Plinko',i:'🔴',g:'plinko'},{n:'Mines',i:'💣',g:'mines'}]
+};
+
+function showMsg(text, type) {
+  const d = document.createElement('div');
+  d.className = type === 'win' ? 'win-msg' : 'lose-msg';
+  d.textContent = text;
+  document.body.appendChild(d);
+  setTimeout(() => d.remove(), 2000);
+}
+let gameStatus = JSON.parse(localStorage.getItem('gameStatus') || '{}');
+function isGameOn(g) { return gameStatus[g] !== false; }
+function waitBtn(btn, sec) { btn.disabled = true; btn.classList.add('wait'); let t = sec; const orig = btn.textContent; const iv = setInterval(() => { btn.textContent = 'Wait ' + t + 's'; if (--t < 0) { clearInterval(iv); btn.disabled = false; btn.classList.remove('wait'); btn.textContent = orig; } }, 1000); }
+
+window.toggleAuth = function() { isLogin = !isLogin; document.getElementById('authTitle').textContent = isLogin ? 'Login' : 'Signup'; document.getElementById('authBtn').textContent = isLogin ? 'Login' : 'Signup'; };
+window.doAuth = async function() { const email = document.getElementById('email').value, pass = document.getElementById('pass').value, msg = document.getElementById('authMsg'); if (!email || pass.length < 6) { msg.className = 'msg err'; msg.textContent = 'Enter email & password'; return; } try { const res = await fetch(API + '/api/' + (isLogin ? 'login' : 'signup'), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password: pass }) }); const data = await res.json(); if (data.error) { msg.className = 'msg err'; msg.textContent = data.error; return; } token = data.token; user = data.user; localStorage.setItem('token', token); localStorage.setItem('user', JSON.stringify(user)); showHome(); } catch (e) { msg.className = 'msg err'; msg.textContent = 'Error'; } };
+window.logout = function() { token = null; user = null; localStorage.removeItem('token'); localStorage.removeItem('user'); if (cpInterval) clearInterval(cpInterval); document.querySelectorAll('.screen').forEach(s => s.classList.remove('on')); document.getElementById('auth').classList.add('on'); document.getElementById('bnav').style.display = 'none'; };
+function showHome() { document.getElementById('auth').classList.remove('on'); document.getElementById('home').classList.add('on'); document.getElementById('bnav').style.display = 'flex'; document.getElementById('accEmail').textContent = user.email; updBal(); drawGames(); initCP(); initMines(); startCPTimer(); showHist(); if (user.email === 'palr50091@gmail.com') { document.getElementById('adminBtn').style.display = 'block'; document.getElementById('adminBtnAcc').style.display = 'block'; } }
+window.show = function(id) { document.querySelectorAll('.screen').forEach(s => s.classList.remove('on')); document.getElementById(id).classList.add('on'); document.querySelectorAll('.bnav div').forEach(n => n.classList.remove('on')); if (id === 'home') document.getElementById('nH').classList.add('on'); if (id === 'wallet') document.getElementById('nW').classList.add('on'); if (id === 'account') document.getElementById('nA').classList.add('on'); if (avIv && id !== 'aviator') { clearInterval(avIv); avRun = false; } if (crashIv && id !== 'crash') { clearInterval(crashIv); crashRun = false; } };
+window.setCat = function(c, el) { document.querySelectorAll('.cat').forEach(t => t.classList.remove('on')); el.classList.add('on'); drawGames(c); };
+function drawGames(cat = 'all') { const g = document.getElementById('gamesGrid'); g.innerHTML = ''; GAMES[cat].forEach(it => { const d = document.createElement('div'); d.className = 'gc' + (isGameOn(it.g) ? '' : ' disabled'); d.innerHTML = `<div class="i">${it.i}</div><div class="n">${it.n}</div>`; d.onclick = () => { if (isGameOn(it.g)) show(it.g); else alert('Game temporarily off'); }; g.appendChild(d); }); }
+function updBal() { const c = user?.coins || 0; document.querySelectorAll('#hBal,#wBal,#accBal,.gBal').forEach(e => e.textContent = c); localStorage.setItem('user', JSON.stringify(user)); }
+async function api(ep, body) { const res = await fetch(API + ep, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }, body: JSON.stringify(body) }); return res.json(); }
+
+// DEPOSIT/WITHDRAW
+window.showDep = function() { document.getElementById('depBox').style.display = 'block'; document.getElementById('witBox').style.display = 'none'; };
+window.showWit = function() { document.getElementById('witBox').style.display = 'block'; document.getElementById('depBox').style.display = 'none'; };
+window.doDep = async function() { const amt = parseInt(document.getElementById('depAmt').value); if (!amt || amt < 1) return alert('Enter amount'); const bonus = amt >= 100 ? 50 : 0; const data = await api('/api/deposit', { amount: amt + bonus }); if (data.success) { user.coins = data.coins; updBal(); addTrans('deposit', amt); if (bonus) addTrans('bonus', bonus); alert('Deposited ₹' + amt + (bonus ? ' + ₹' + bonus + ' bonus!' : '')); document.getElementById('depAmt').value = ''; document.getElementById('depBox').style.display = 'none'; } };
+window.doWit = async function() { const amt = parseInt(document.getElementById('witAmt').value); if (!amt || amt < 1) return alert('Enter amount'); const data = await api('/api/withdraw', { amount: amt }); if (data.error) return alert(data.error); if (data.success) { user.coins = data.coins; updBal(); addTrans('withdraw', amt); alert('Withdraw ₹' + amt); document.getElementById('witAmt').value = ''; document.getElementById('witBox').style.display = 'none'; } };
+function addTrans(type, amt) { transactions.unshift({ type, amt, email: user.email, time: new Date().toLocaleString() }); if (transactions.length > 50) transactions.pop(); localStorage.setItem('transactions', JSON.stringify(transactions)); showHist(); }
+function showHist() { const l = document.getElementById('histList'); if (!transactions.length) { l.innerHTML = '<div class="empty">No transactions</div>'; return; } l.innerHTML = transactions.slice(0, 10).map(t => `<div class="hi"><span>${t.type}<br><small>${t.time}</small></span><span style="color:${t.type==='withdraw'?'#ef4444':'#22c55e'}">${t.type==='withdraw'?'-':'+'}₹${t.amt}</span></div>`).join(''); }
+
+// AVIATOR
+window.setAvBet = function(a) { document.getElementById('avBetAmt').value = a; };
+// 3D AVIATOR
+let avScene, avCamera, avRenderer, avPlane, avAnimating = false;
+
+function init3DAv() {
+  const container = document.getElementById('av3d');
+  if (!container || avRenderer) return;
+  const w = container.clientWidth || 340;
+  const h = 200;
+  avScene = new THREE.Scene();
+  avCamera = new THREE.PerspectiveCamera(40, w / h, 0.1, 1000);
+  avCamera.position.set(0, 0, 5);
+  avRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  avRenderer.setSize(w, h);
+  avRenderer.setClearColor(0x0a0a2e, 1);
+  container.innerHTML = '';
+  container.appendChild(avRenderer.domElement);
+
+  // Blue + White plane like icon
+  const canvas = document.createElement('canvas');
+  canvas.width = 256; canvas.height = 128;
+  const ctx = canvas.getContext('2d');
+  
+  // Blue body
+  ctx.fillStyle = '#3b82f6';
+  ctx.beginPath();
+  ctx.moveTo(220, 64);
+  ctx.lineTo(150, 45);
+  ctx.lineTo(60, 55);
+  ctx.lineTo(30, 75);
+  ctx.lineTo(90, 80);
+  ctx.lineTo(140, 70);
+  ctx.lineTo(190, 85);
+  ctx.closePath();
+  ctx.fill();
+  
+  // White windows / highlights
+  ctx.fillStyle = '#ffffff';
+  ctx.beginPath();
+  ctx.arc(180, 60, 8, 0, Math.PI * 2);
+  ctx.arc(155, 58, 6, 0, Math.PI * 2);
+  ctx.arc(135, 60, 5, 0, Math.PI * 2);
+  ctx.fill();
+  
+  // White wing highlight
+  ctx.beginPath();
+  ctx.moveTo(110, 58);
+  ctx.lineTo(70, 95);
+  ctx.lineTo(130, 68);
+  ctx.fill();
+
+  const texture = new THREE.CanvasTexture(canvas);
+  const material = new THREE.SpriteMaterial({ map: texture, transparent: true });
+  avPlane = new THREE.Sprite(material);
+  avPlane.scale.set(2.8, 1.5, 1);
+  avPlane.position.set(-1.5, 0, 0);
+  avScene.add(avPlane);
+
+  // Blue trail
+  const trailPoints = [];
+  for (let i = 0; i < 20; i++) {
+    trailPoints.push(new THREE.Vector3(-3 + i * 0.12, -0.1, 0));
+  }
+  const trailGeo = new THREE.BufferGeometry().setFromPoints(trailPoints);
+  const trailMat = new THREE.LineBasicMaterial({ color: 0x3b82f6, transparent: true, opacity: 0.5 });
+  const trail = new THREE.Line(trailGeo, trailMat);
+  avScene.add(trail);
+
+  function animate() {
+    requestAnimationFrame(animate);
+    if (avAnimating) {
+      avPlane.position.x += 0.01;
+      avPlane.position.y += 0.003;
+    }
+    avRenderer.render(avScene, avCamera);
+  }
+  animate();
+  avRenderer.render(avScene, avCamera);
+}
+
+const oldShow = window.show;
+window.show = function(id) {
+  oldShow(id);
+  if (id === 'dice' && !diceRenderer) setTimeout(init3DDice, 100);
+  if (id === 'aviator' && !avRenderer) setTimeout(init3DAv, 100);
+};
+
+window.startAv = function() { 
+  if (avWait) return; 
+  if (!avRenderer) init3DAv();
+  const bet = parseInt(document.getElementById('avBetAmt').value) || 20; 
+  if (user.coins < bet) return alert('Low balance'); 
+  user.coins -= bet; 
+  updBal(); 
+  avRun = true; 
+  avM = 1; 
+  avAnimating = true;
+  if (avPlane) avPlane.position.set(-3, 0, 0);
+  document.getElementById('avBet').style.display = 'none'; 
+  document.getElementById('avCash').style.display = 'block'; 
+  document.getElementById('avInfo').textContent = 'Flying...'; 
+  avIv = setInterval(() => { 
+    avM += 0.02 + Math.random() * 0.02; 
+    document.getElementById('avMult').textContent = avM.toFixed(2) + 'x'; 
+    document.getElementById('avCashAmt').textContent = Math.floor(bet * avM); 
+    if (Math.random() < 0.008 + avM * 0.0012 || avM > 15) avBoom(bet); 
+  }, 50); 
+};
+window.cashAv = function() { if (!avRun) return; clearInterval(avIv); avRun = false; const bet = parseInt(document.getElementById('avBetAmt').value) || 20; const w = Math.floor(bet * avM); user.coins += w; updBal(); showMsg('🎉 CASHED OUT ₹' + w + '!', 'win'); document.getElementById('avInfo').textContent = '+' + w; document.getElementById('avInfo').className = 'gi w'; addAvHist(avM); resetAv(); };
+function avBoom(bet) { clearInterval(avIv); avRun = false; document.getElementById('avMult').textContent = 'CRASH'; document.getElementById('avMult').className = 'av-mult crash'; showMsg('❌ CRASHED! You lost ₹' + bet, 'lose'); document.getElementById('avInfo').textContent = 'Crashed at ' + avM.toFixed(2) + 'x'; document.getElementById('avInfo').className = 'gi l'; addAvHist(avM); resetAv(); }
+function resetAv() { 
+  document.getElementById('avCash').style.display = 'none'; 
+  document.getElementById('avBet').style.display = 'block'; 
+  avWait = true; 
+  avAnimating = false;
+  if (avPlane) avPlane.position.set(-3, 0, 0);
+  waitBtn(document.getElementById('avBet'), 10); 
+  setTimeout(() => { 
+    document.getElementById('avMult').textContent = '1.00x'; 
+    document.getElementById('avMult').className = 'av-mult'; 
+    document.getElementById('avInfo').textContent = 'Place your bet'; 
+    document.getElementById('avInfo').className = 'gi'; 
+    avWait = false; 
+  }, 10000); 
+}
+function addAvHist(m) { avHist.unshift(m); if (avHist.length > 8) avHist.pop(); document.getElementById('avHist').innerHTML = avHist.map(v => `<span class="ah ${v<2?'l':v<5?'m':'h'}">${v.toFixed(2)}x</span>`).join(''); }
+
+// CRASH
+window.setCrashBet = function(a) { document.getElementById('crashBetAmt').value = a; };
+// 3D CRASH
+let crashScene, crashCamera, crashRenderer, crashRocket, crashAnimating = false;
+
+function init3DCrash() {
+  const container = document.getElementById('crash3d');
+  if (!container || crashRenderer) return;
+  const w = container.clientWidth || 340;
+  const h = 200;
+  crashScene = new THREE.Scene();
+  crashCamera = new THREE.PerspectiveCamera(50, w / h, 0.1, 1000);
+  crashCamera.position.set(0, 1.5, 6);
+  crashRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  crashRenderer.setSize(w, h);
+  crashRenderer.setClearColor(0x000000, 0);
+  container.innerHTML = '';
+  container.appendChild(crashRenderer.domElement);
+
+  // Bigger rocket
+  const geometry = new THREE.ConeGeometry(0.5, 1.8, 8);
+  const material = new THREE.MeshBasicMaterial({ color: 0xff2200 });
+  crashRocket = new THREE.Mesh(geometry, material);
+  crashRocket.rotation.z = Math.PI / 2;
+  crashRocket.position.set(-2.5, 0, 0);
+  crashScene.add(crashRocket);
+
+  // Flame
+  const flameGeo = new THREE.ConeGeometry(0.25, 0.8, 6);
+  const flameMat = new THREE.MeshBasicMaterial({ color: 0xffcc00 });
+  const flame = new THREE.Mesh(flameGeo, flameMat);
+  flame.position.set(-1.2, 0, 0);
+  flame.rotation.z = -Math.PI / 2;
+  crashRocket.add(flame);
+
+  const light = new THREE.AmbientLight(0xffffff, 1.5);
+  crashScene.add(light);
+
+  function animate() {
+    requestAnimationFrame(animate);
+    if (crashAnimating) {
+      crashRocket.position.x += 0.014;
+      crashRocket.position.y += 0.007;
+    }
+    crashRenderer.render(crashScene, crashCamera);
+  }
+  animate();
+  crashRenderer.render(crashScene, crashCamera);
+}
+
+const prevShow = window.show;
+window.show = function(id) {
+  prevShow(id);
+  if (id === 'dice' && !diceRenderer) setTimeout(init3DDice, 100);
+  if (id === 'aviator' && !avRenderer) setTimeout(init3DAv, 100);
+  if (id === 'crash' && !crashRenderer) setTimeout(init3DCrash, 100);
+};
+
+window.startCrash = function() { 
+  if (crashWait) return; 
+  if (!crashRenderer) init3DCrash();
+  const bet = parseInt(document.getElementById('crashBetAmt').value) || 20; 
+  if (user.coins < bet) return alert('Low balance'); 
+  user.coins -= bet; 
+  updBal(); 
+  crashRun = true; 
+  crashM = 1; 
+  crashAnimating = true;
+  if (crashRocket) crashRocket.position.set(-3, 0, 0);
+  document.getElementById('crashBet').style.display = 'none'; 
+  document.getElementById('crashCash').style.display = 'block'; 
+  document.getElementById('crashInfo').textContent = 'Flying...'; 
+  crashIv = setInterval(() => { 
+    crashM += 0.025 + Math.random() * 0.02; 
+    document.getElementById('crashMult').textContent = crashM.toFixed(2) + 'x'; 
+    document.getElementById('crashCashAmt').textContent = Math.floor(bet * crashM); 
+    if (Math.random() < 0.01 + crashM * 0.0015 || crashM > 12) crashBoom(bet); 
+  }, 55); 
+};
+window.cashCrash = function() { if (!crashRun) return; clearInterval(crashIv); crashRun = false; const bet = parseInt(document.getElementById('crashBetAmt').value) || 20; const w = Math.floor(bet * crashM); user.coins += w; updBal(); document.getElementById('crashInfo').textContent = '+' + w; document.getElementById('crashInfo').className = 'gi w'; addCrashHist(crashM); resetCrash(); };
+function crashBoom(bet) { clearInterval(crashIv); crashRun = false; document.getElementById('crashMult').textContent = 'BOOM'; document.getElementById('crashMult').className = 'av-mult crash'; document.getElementById('crashInfo').textContent = 'Crashed at ' + crashM.toFixed(2) + 'x'; document.getElementById('crashInfo').className = 'gi l'; addCrashHist(crashM); resetCrash(); }
+function resetCrash() { 
+  document.getElementById('crashCash').style.display = 'none'; 
+  document.getElementById('crashBet').style.display = 'block'; 
+  crashWait = true; 
+  crashAnimating = false;
+  if (crashRocket) crashRocket.position.set(-3, 0, 0);
+  waitBtn(document.getElementById('crashBet'), 10); 
+  setTimeout(() => { 
+    document.getElementById('crashMult').textContent = '1.00x'; 
+    document.getElementById('crashMult').className = 'av-mult'; 
+    document.getElementById('crashInfo').textContent = 'Place your bet'; 
+    document.getElementById('crashInfo').className = 'gi'; 
+    crashWait = false; 
+  }, 10000); 
+}
+function addCrashHist(m) { crashHist.unshift(m); if (crashHist.length > 8) crashHist.pop(); document.getElementById('crashHist').innerHTML = crashHist.map(v => `<span class="ah ${v<2?'l':v<5?'m':'h'}">${v.toFixed(2)}x</span>`).join(''); }
+
+// COLOR PRED
+function initCP() { const g = document.getElementById('cpNums'); g.innerHTML = ''; for (let i = 0; i <= 9; i++) { const c = i === 0 || i === 5 ? 'v' : [1,3,7,9].includes(i) ? 'g' : 'r'; const b = document.createElement('button'); b.className = 'cp-num ' + c; b.textContent = i; b.onclick = () => betCP(i, b); g.appendChild(b); } }
+let cpTimerSec = 30;
+window.setCPTimer = function(sec, el) {
+  cpTimerSec = sec;
+  cpTime = sec;
+  document.querySelectorAll('.cp-timer-select button').forEach(b => b.classList.remove('on'));
+  el.classList.add('on');
+  document.getElementById('cpTimer').textContent = '00:' + String(sec).padStart(2,'0');
+};
+function startCPTimer() { 
+  if (cpInterval) clearInterval(cpInterval); 
+  cpTime = cpTimerSec; 
+  cpInterval = setInterval(() => { 
+    cpTime--; 
+    if (cpTime < 0) { 
+      cpTime = cpTimerSec; 
+      cpPeriod++; 
+      document.getElementById('cpPeriod').textContent = cpPeriod; 
+    } 
+    const m = Math.floor(cpTime / 60);
+    const s = cpTime % 60;
+    document.getElementById('cpTimer').textContent = String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0'); 
+  }, 1000); 
+}
+window.betCP = function(c, el) { cpBet = c; document.querySelectorAll('.cp-btn,.cp-num,.cp-size button').forEach(b => b.classList.remove('sel')); el.classList.add('sel'); document.getElementById('cpBet').disabled = false; };
+window.playCP = async function() { 
+  if (cpBet === null) return; 
+  const bet = parseInt(document.getElementById('cpBetAmt').value) || 10; 
+  if (user.coins < bet) return alert('Low balance'); 
+  document.getElementById('cpBet').disabled = true; 
+  document.getElementById('cpInfo').textContent = 'Waiting for result...'; 
+  // Force 10 second minimum delay
+  await new Promise(r => setTimeout(r, 10000));
+  const data = await api('/api/game/color', { bet: cpBet, amount: bet }); 
+  if (data.error) { alert(data.error); document.getElementById('cpBet').disabled = false; return; } 
+  user.coins = data.coins; 
+  updBal(); 
+  const r = data.result; 
+  const bs = r.num >= 5 ? 'Big' : 'Small'; 
+  cpHistory.unshift({ p: cpPeriod, n: r.num, bs, c: r.color }); 
+  if (cpHistory.length > 8) cpHistory.pop(); 
+  showCPHist(); 
+  const overlay = document.createElement('div');
+  overlay.className = 'result-overlay';
+  overlay.innerHTML = `<div class="result-box ${data.win?'win':'lose'}"><h3>${data.win?'🎉 YOU WON!':'❌ YOU LOST'}</h3><p>Result: ${r.num} (${r.color})</p><p>${data.win?'+₹'+data.winAmt:'Lost ₹'+bet}</p></div>`;
+  document.body.appendChild(overlay);
+  setTimeout(() => overlay.remove(), 3000);
+  cpBet = null; 
+  document.querySelectorAll('.cp-btn,.cp-num,.cp-size button').forEach(b => b.classList.remove('sel')); 
+  waitBtn(document.getElementById('cpBet'), 5); 
+  setTimeout(() => { document.getElementById('cpInfo').textContent = 'Select bet'; document.getElementById('cpInfo').className = 'gi'; }, 5000); 
+};
+function showCPHist() { document.getElementById('cpHist').innerHTML = cpHistory.map(h => { const dc = h.c === 'Green' ? '#22c55e' : h.c === 'Red' ? '#ef4444' : '#a855f7'; return `<tr><td>${h.p}</td><td><span class="num-ball" style="background:${dc}">${h.n}</span></td><td>${h.bs}</td><td><span class="dot" style="background:${dc}"></span></td></tr>`; }).join(''); }
+
+// DRAGON TIGER
+window.betDT = function(b, el) { dtBet = b; document.querySelectorAll('.dt-bet').forEach(x => x.classList.remove('sel')); el.classList.add('sel'); document.getElementById('dtPlay').disabled = false; };
+window.setDTAmt = function(a) { document.getElementById('dtBetAmt').value = a; };
+window.playDT = function() { if (!dtBet) return alert('Select bet'); const bet = parseInt(document.getElementById('dtBetAmt').value) || 10; if (user.coins < bet) return alert('Low balance'); user.coins -= bet; updBal(); document.getElementById('dtPlay').disabled = true; const dEl = document.getElementById('dtD'), tEl = document.getElementById('dtT'); dEl.className = 'card back spinning'; tEl.className = 'card back spinning'; document.getElementById('dtInfo').textContent = 'Dealing...'; let c = 0; const iv = setInterval(() => { dEl.textContent = allCards[Math.floor(Math.random()*allCards.length)]; tEl.textContent = allCards[Math.floor(Math.random()*allCards.length)]; if (++c > 20) { clearInterval(iv); const dCard = allCards[Math.floor(Math.random()*allCards.length)], tCard = allCards[Math.floor(Math.random()*allCards.length)]; const dVal = allCards.indexOf(dCard) % 13 + 1, tVal = allCards.indexOf(tCard) % 13 + 1; dEl.className = getCardClass(dCard); dEl.textContent = dCard; tEl.className = getCardClass(tCard); tEl.textContent = tCard; let res = dVal > tVal ? 'Dragon' : tVal > dVal ? 'Tiger' : 'Tie'; if (dtBet === res) { const w = res === 'Tie' ? bet * 8 : bet * 2; user.coins += w; updBal(); document.getElementById('dtInfo').textContent = res + ' +₹' + w; document.getElementById('dtInfo').className = 'gi w'; } else { document.getElementById('dtInfo').textContent = res + ' won. Lost!'; document.getElementById('dtInfo').className = 'gi l'; } dtBet = null; document.querySelectorAll('.dt-bet').forEach(x => x.classList.remove('sel')); waitBtn(document.getElementById('dtPlay'), 5); } }, 80); };
+
+// SLOTS
+window.setSlotAmt = function(a) { document.getElementById('slotBetAmt').value = a; };
+window.spin = function() { 
+  const bet = parseInt(document.getElementById('slotBetAmt').value) || 20; 
+  if (user.coins < bet) return alert('Low balance'); 
+  user.coins -= bet; 
+  updBal(); 
+  document.getElementById('slotBtn').disabled = true; 
+  document.querySelectorAll('.slot-reel').forEach(r => r.classList.add('spin')); 
+  document.getElementById('slotInfo').textContent = 'Spinning...';
+  // 10 second spin
+  setTimeout(() => {
+    document.querySelectorAll('.slot-reel').forEach(r => r.classList.remove('spin')); 
+    const s = [0,1,2].map(() => syms[Math.floor(Math.random()*syms.length)]); 
+    document.getElementById('s1').textContent = s[0]; 
+    document.getElementById('s2').textContent = s[1]; 
+    document.getElementById('s3').textContent = s[2]; 
+    if (s[0]===s[1] && s[1]===s[2]) { 
+      user.coins += bet * 5; 
+      updBal(); 
+      showMsg('🎊 JACKPOT ₹' + (bet*5) + '!', 'win'); 
+      document.getElementById('slotInfo').textContent = '🎊 JACKPOT +₹' + (bet*5); 
+      document.getElementById('slotInfo').className = 'gi w'; 
+    } else if (s[0]===s[1] || s[1]===s[2]) { 
+      user.coins += Math.floor(bet * 1.5); 
+      updBal(); 
+      showMsg('✨ WIN ₹' + Math.floor(bet*1.5) + '!', 'win'); 
+      document.getElementById('slotInfo').textContent = '✨ WIN +₹' + Math.floor(bet*1.5); 
+      document.getElementById('slotInfo').className = 'gi w'; 
+    } else { 
+      showMsg('❌ No match', 'lose'); 
+      document.getElementById('slotInfo').textContent = 'No match'; 
+      document.getElementById('slotInfo').className = 'gi l'; 
+    } 
+    waitBtn(document.getElementById('slotBtn'), 5); 
+  }, 10000);
+};
+
+// DICE
+// 3D DICE with Three.js - Better version with dots
+let diceScene, diceCamera, diceRenderer, diceMesh, diceAnimating = false;
+
+function createDiceTexture(num) {
+  const canvas = document.createElement('canvas');
+  canvas.width = 128; canvas.height = 128;
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, 128, 128);
+  ctx.fillStyle = '#000000';
+  ctx.font = 'bold 40px Arial';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  // Draw dots based on number
+  const dots = {
+    1: [[64,64]],
+    2: [[32,32],[96,96]],
+    3: [[32,32],[64,64],[96,96]],
+    4: [[32,32],[96,32],[32,96],[96,96]],
+    5: [[32,32],[96,32],[64,64],[32,96],[96,96]],
+    6: [[32,32],[96,32],[32,64],[96,64],[32,96],[96,96]]
+  };
+  (dots[num] || dots[1]).forEach(([x,y]) => {
+    ctx.beginPath();
+    ctx.arc(x, y, 10, 0, Math.PI * 2);
+    ctx.fill();
+  });
+  return new THREE.CanvasTexture(canvas);
+}
+
+function init3DDice() {
+  const container = document.getElementById('dice3d');
+  if (!container || diceRenderer) return;
+  diceScene = new THREE.Scene();
+  diceCamera = new THREE.PerspectiveCamera(50, 1, 0.1, 1000);
+  diceCamera.position.z = 4;
+  diceRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  diceRenderer.setSize(200, 200);
+  diceRenderer.setClearColor(0x000000, 0);
+  container.appendChild(diceRenderer.domElement);
+
+  const geometry = new THREE.BoxGeometry(1.6, 1.6, 1.6);
+  const materials = [
+    new THREE.MeshBasicMaterial({ map: createDiceTexture(1) }),
+    new THREE.MeshBasicMaterial({ map: createDiceTexture(2) }),
+    new THREE.MeshBasicMaterial({ map: createDiceTexture(3) }),
+    new THREE.MeshBasicMaterial({ map: createDiceTexture(4) }),
+    new THREE.MeshBasicMaterial({ map: createDiceTexture(5) }),
+    new THREE.MeshBasicMaterial({ map: createDiceTexture(6) })
+  ];
+  diceMesh = new THREE.Mesh(geometry, materials);
+  diceScene.add(diceMesh);
+
+  const light = new THREE.AmbientLight(0xffffff, 1.2);
+  diceScene.add(light);
+
+  // Show initial face
+  diceMesh.rotation.x = 0.3;
+  diceMesh.rotation.y = 0.4;
+
+  function animate() {
+    requestAnimationFrame(animate);
+    if (diceAnimating) {
+      diceMesh.rotation.x += 0.25;
+      diceMesh.rotation.y += 0.2;
+      diceMesh.rotation.z += 0.1;
+    }
+    diceRenderer.render(diceScene, diceCamera);
+  }
+  animate();
+}
+
+// Initialize dice when screen is shown
+const originalShow = window.show;
+window.show = function(id) {
+  originalShow(id);
+  if (id === 'dice' && !diceRenderer) setTimeout(init3DDice, 100);
+};
+
+window.playDice = async function(choice) { 
+  if (!diceRenderer) init3DDice();
+  const bet = parseInt(document.getElementById('diceBetAmt').value) || 10; 
+  if (user.coins < bet) return alert('Low balance'); 
+  user.coins -= bet; 
+  updBal(); 
+  diceAnimating = true;
+  document.getElementById('diceInfo').textContent = 'Rolling 3D Dice...'; 
+  
+  setTimeout(() => {
+    diceAnimating = false;
+    const result = Math.floor(Math.random() * 6) + 1;
+    // Rough stop rotation
+    diceMesh.rotation.set(result * 0.8, result * 0.5, 0);
+    
+    api('/api/game/dice', { bet: choice, amount: bet }).then(data => { 
+      if (data.error) { alert(data.error); return; } 
+      user.coins = data.coins; 
+      updBal(); 
+      const overlay = document.createElement('div');
+      overlay.className = 'result-overlay';
+      overlay.innerHTML = `<div class="result-box ${data.win?'win':'lose'}"><h3>${data.win?'🎉 YOU WON!':'❌ YOU LOST'}</h3><p>Dice: ${data.dice || result}</p><p>${data.win?'+₹'+data.winAmt:'Lost ₹'+bet}</p></div>`;
+      document.body.appendChild(overlay);
+      setTimeout(() => overlay.remove(), 3000);
+      document.getElementById('diceInfo').textContent = data.win ? '🎉 WIN +₹' + data.winAmt : 'Lost';
+      document.getElementById('diceInfo').className = data.win ? 'gi w' : 'gi l';
+    }); 
+  }, 10000);
+};
+
+// COIN
+window.playCoin = function(choice) { const bet = parseInt(document.getElementById('coinBetAmt').value) || 10; if (user.coins < bet) return alert('Low balance'); user.coins -= bet; updBal(); const box = document.getElementById('coinBox'); box.classList.add('flipping'); document.getElementById('coinInfo').textContent = 'Flipping...'; let c = 0; const iv = setInterval(() => { if (++c > 8) { clearInterval(iv); box.classList.remove('flipping'); const res = Math.random() > 0.5 ? 'Heads' : 'Tails'; if (res === 'Heads') { box.className = 'coin heads'; box.textContent = 'H'; } else { box.className = 'coin tails'; box.textContent = 'T'; } if (choice === res) { user.coins += bet * 2; updBal(); document.getElementById('coinInfo').textContent = '🎉 WIN +₹' + (bet*2); document.getElementById('coinInfo').className = 'gi w'; } else { document.getElementById('coinInfo').textContent = res; document.getElementById('coinInfo').className = 'gi l'; } } }, 100); };
+
+// TEEN PATTI
+window.playTP = function() { const bet = parseInt(document.getElementById('tpBetAmt').value) || 20; if (user.coins < bet) return alert('Low balance'); user.coins -= bet; updBal(); document.getElementById('tpBtn').disabled = true; const container = document.getElementById('tpCards'); container.innerHTML = '<span class="card back spinning">🂠</span><span class="card back spinning">🂠</span><span class="card back spinning">🂠</span>'; document.getElementById('tpInfo').textContent = 'Dealing...'; let c = 0; const iv = setInterval(() => { if (++c > 15) { clearInterval(iv); const hand = [0,1,2].map(() => allCards[Math.floor(Math.random()*allCards.length)]); container.innerHTML = hand.map(cd => `<span class="${getCardClass(cd)}">${cd}</span>`).join(''); if (Math.random() > 0.5) { user.coins += bet * 2; updBal(); document.getElementById('tpInfo').textContent = '🎉 WIN +₹' + (bet*2); document.getElementById('tpInfo').className = 'gi w'; } else { document.getElementById('tpInfo').textContent = 'Lost!'; document.getElementById('tpInfo').className = 'gi l'; } waitBtn(document.getElementById('tpBtn'), 5); } }, 80); };
+
+// ANDAR BAHAR
+window.playAB = function(choice) { const bet = parseInt(document.getElementById('abBetAmt').value) || 10; if (user.coins < bet) return alert('Low balance'); user.coins -= bet; updBal(); document.getElementById('abMid').innerHTML = '<span class="card back spinning">🂠</span>'; document.getElementById('abA').innerHTML = '<span class="card back spinning">🂠</span>'; document.getElementById('abB').innerHTML = '<span class="card back spinning">🂠</span>'; document.getElementById('abInfo').textContent = 'Dealing...'; let c = 0; const iv = setInterval(() => { if (++c > 12) { clearInterval(iv); const mid = allCards[Math.floor(Math.random()*allCards.length)], a = allCards[Math.floor(Math.random()*allCards.length)], b = allCards[Math.floor(Math.random()*allCards.length)]; document.getElementById('abMid').innerHTML = `<span class="${getCardClass(mid)}">${mid}</span>`; document.getElementById('abA').innerHTML = `<span class="${getCardClass(a)}">${a}</span>`; document.getElementById('abB').innerHTML = `<span class="${getCardClass(b)}">${b}</span>`; const res = Math.random() > 0.5 ? 'Andar' : 'Bahar'; if (choice === res) { user.coins += bet * 2; updBal(); document.getElementById('abInfo').textContent = '🎉 ' + res + ' WIN +₹' + (bet*2); document.getElementById('abInfo').className = 'gi w'; } else { document.getElementById('abInfo').textContent = res + ' won. Lost!'; document.getElementById('abInfo').className = 'gi l'; } } }, 80); };
+
+// K3
+window.playK3 = function(choice) { const bet = parseInt(document.getElementById('k3BetAmt').value) || 10; if (user.coins < bet) return alert('Low balance'); user.coins -= bet; updBal(); const d = diceFaces; const r = [1,2,3].map(() => Math.floor(Math.random()*6)+1); document.getElementById('k3d1').textContent = d[r[0]-1]; document.getElementById('k3d2').textContent = d[r[1]-1]; document.getElementById('k3d3').textContent = d[r[2]-1]; const sum = r[0]+r[1]+r[2]; const res = sum >= 11 ? 'Big' : 'Small'; if (choice === res) { user.coins += bet * 2; updBal(); document.getElementById('k3Info').textContent = '🎉 WIN! Sum: ' + sum; document.getElementById('k3Info').className = 'gi w'; } else { document.getElementById('k3Info').textContent = 'Lost. Sum: ' + sum + ' (' + res + ')'; document.getElementById('k3Info').className = 'gi l'; } };
+
+// HI-LO
+window.playHilo = function(choice) { const bet = parseInt(document.getElementById('hiloBetAmt').value) || 10; if (user.coins < bet) return alert('Low balance'); user.coins -= bet; updBal(); const newVal = Math.floor(Math.random()*13)+1; document.getElementById('hiloCard').textContent = allCards[newVal-1]; const win = (choice === 'Higher' && newVal > hiloVal) || (choice === 'Lower' && newVal < hiloVal); if (win) { user.coins += bet * 2; updBal(); document.getElementById('hiloInfo').textContent = '🎉 WIN'; document.getElementById('hiloInfo').className = 'gi w'; } else { document.getElementById('hiloInfo').textContent = 'Lost!'; document.getElementById('hiloInfo').className = 'gi l'; } hiloVal = newVal; };
+
+// PLINKO
+window.playPlinko = function() { const bet = parseInt(document.getElementById('plinkoBetAmt').value) || 10; if (user.coins < bet) return alert('Low balance'); user.coins -= bet; updBal(); document.getElementById('plinkoBtn').disabled = true; const ball = document.getElementById('plinkoBall'); ball.style.left = '50%'; ball.style.top = '0'; const mults = [0.5, 1, 2, 5, 10]; const idx = Math.floor(Math.random()*5); const x = 10 + idx * 18; setTimeout(() => { ball.style.left = x + '%'; ball.style.top = '80%'; const win = Math.floor(bet * mults[idx]); user.coins += win; updBal(); document.getElementById('plinkoInfo').textContent = mults[idx] + 'x = ₹' + win; document.getElementById('plinkoInfo').className = win > bet ? 'gi w' : 'gi l'; waitBtn(document.getElementById('plinkoBtn'), 5); }, 500); };
+
+// MINES
+function initMines() { const g = document.getElementById('minesGrid'); g.innerHTML = ''; minesBombs = []; minesActive = false; for (let i = 0; i < 25; i++) { const b = document.createElement('button'); b.style.cssText = 'aspect-ratio:1;background:#1a1a2e;border:1px solid #333;border-radius:6px;font-size:16px;cursor:pointer'; b.textContent = '?'; b.onclick = () => clickMine(i, b); g.appendChild(b); } }
+window.startMines = function() { const bet = parseInt(document.getElementById('minesBetAmt').value) || 10; if (user.coins < bet) return alert('Low balance'); user.coins -= bet; updBal(); initMines(); minesActive = true; while (minesBombs.length < 5) { const r = Math.floor(Math.random() * 25); if (!minesBombs.includes(r)) minesBombs.push(r); } document.getElementById('minesInfo').textContent = 'Click cells!'; };
+window.clickMine = function(i, el) { if (!minesActive || el.textContent !== '?') return; if (minesBombs.includes(i)) { el.style.background = '#ef4444'; el.textContent = '💣'; minesActive = false; document.getElementById('minesInfo').textContent = '💥 Boom!'; document.querySelectorAll('#minesGrid button').forEach((c, idx) => { if (minesBombs.includes(idx)) { c.style.background = '#ef4444'; c.textContent = '💣'; } }); } else { el.style.background = '#22c55e'; el.textContent = '💎'; const bet = parseInt(document.getElementById('minesBetAmt').value) || 10; user.coins += Math.floor(bet * 0.3); updBal(); document.getElementById('minesInfo').textContent = '💎 +₹' + Math.floor(bet * 0.3); } };
+
+// WHEEL
+window.spinWheel = function() { const bet = parseInt(document.getElementById('wheelBetAmt').value) || 10; if (user.coins < bet) return alert('Low balance'); user.coins -= bet; updBal(); document.getElementById('wheelBtn').disabled = true; const icon = document.getElementById('wheelIcon'); icon.style.animation = 'diceSpin .2s linear infinite'; document.getElementById('wheelInfo').textContent = 'Spinning...'; setTimeout(() => { icon.style.animation = ''; const mults = [0, 0.5, 1, 2, 5, 10]; const idx = Math.floor(Math.random()*mults.length); const win = Math.floor(bet * mults[idx]); user.coins += win; updBal(); document.getElementById('wheelInfo').textContent = mults[idx] + 'x = ₹' + win; document.getElementById('wheelInfo').className = win > bet ? 'gi w' : 'gi l'; waitBtn(document.getElementById('wheelBtn'), 5); }, 2000); };
+
+// ROULETTE
+window.playRoulette = function(choice) { const bet = parseInt(document.getElementById('rouletteBetAmt').value) || 10; if (user.coins < bet) return alert('Low balance'); user.coins -= bet; updBal(); const num = Math.floor(Math.random()*37); const res = num === 0 ? 'Green' : num % 2 === 0 ? 'Red' : 'Black'; document.getElementById('rouletteNum').textContent = num; document.getElementById('rouletteNum').style.color = res === 'Red' ? '#ef4444' : res === 'Black' ? '#fff' : '#22c55e'; if (choice === res) { const w = res === 'Green' ? bet * 14 : bet * 2; user.coins += w; updBal(); document.getElementById('rouletteInfo').textContent = '🎉 ' + res + ' +₹' + w; document.getElementById('rouletteInfo').className = 'gi w'; } else { document.getElementById('rouletteInfo').textContent = res + ' (' + num + '). Lost!'; document.getElementById('rouletteInfo').className = 'gi l'; } };
+
+// ROULETTE
+window.playRoulette = function(choice) { const bet = parseInt(document.getElementById('rouletteBetAmt').value) || 10; if (user.coins < bet) return alert('Low balance'); user.coins -= bet; updBal(); const num = Math.floor(Math.random()*37); const res = num === 0 ? 'Green' : num % 2 === 0 ? 'Red' : 'Black'; document.getElementById('rouletteNum').textContent = num; document.getElementById('rouletteNum').style.color = res === 'Red' ? '#ef4444' : res === 'Black' ? '#fff' : '#22c55e'; if (choice === res) { const w = res === 'Green' ? bet * 14 : bet * 2; user.coins += w; updBal(); showMsg('🎉 YOU WON ₹' + w + '!', 'win'); document.getElementById('rouletteInfo').textContent = '🎉 ' + res + ' +₹' + w; document.getElementById('rouletteInfo').className = 'gi w'; } else { showMsg('❌ YOU LOST!', 'lose'); document.getElementById('rouletteInfo').textContent = res + ' (' + num + '). Lost!'; document.getElementById('rouletteInfo').className = 'gi l'; } };
+
+window.playBac = function(choice) { 
+  const bet = parseInt(document.getElementById('bacBetAmt').value) || 10; 
+  if (user.coins < bet) return alert('Low balance'); 
+  user.coins -= bet; 
+  updBal(); 
+  document.getElementById('bacInfo').textContent = 'Dealing...';
+  const pEl = document.getElementById('bacP'), bEl = document.getElementById('bacB');
+  pEl.className = 'card back spinning'; bEl.className = 'card back spinning';
+  setTimeout(() => {
+    const pCard = allCards[Math.floor(Math.random()*allCards.length)];
+    const bCard = allCards[Math.floor(Math.random()*allCards.length)];
+    pEl.className = getCardClass(pCard); pEl.textContent = pCard;
+    bEl.className = getCardClass(bCard); bEl.textContent = bCard;
+    const res = Math.random() > 0.5 ? 'Player' : 'Banker';
+    if (choice === res) { 
+      const w = res === 'Player' ? bet * 2 : Math.floor(bet * 1.95);
+      user.coins += w; updBal(); 
+      showMsg('🎉 ' + res + ' WIN +₹' + w, 'win'); 
+      document.getElementById('bacInfo').textContent = res + ' WIN'; 
+      document.getElementById('bacInfo').className = 'gi w'; 
+    } else { 
+      showMsg('❌ ' + res + ' won. You lost!', 'lose'); 
+      document.getElementById('bacInfo').textContent = res + ' won'; 
+      document.getElementById('bacInfo').className = 'gi l'; 
+    }
+  }, 10000);
+};
+window.playBJ = function() { 
+  const bet = parseInt(document.getElementById('bjBetAmt').value) || 20; 
+  if (user.coins < bet) return alert('Low balance'); 
+  user.coins -= bet; 
+  updBal(); 
+  document.getElementById('bjBtn').disabled = true;
+  document.getElementById('bjInfo').textContent = 'Dealing...';
+  document.getElementById('bjCards').innerHTML = '<span class="card back spinning">🂠</span><span class="card back spinning">🂠</span>';
+  setTimeout(() => {
+    const c1 = allCards[Math.floor(Math.random()*allCards.length)];
+    const c2 = allCards[Math.floor(Math.random()*allCards.length)];
+    document.getElementById('bjCards').innerHTML = `<span class="${getCardClass(c1)}">${c1}</span><span class="${getCardClass(c2)}">${c2}</span>`;
+    if (Math.random() > 0.45) { 
+      user.coins += bet * 2; updBal(); 
+      showMsg('🎉 YOU WON ₹' + (bet*2) + '!', 'win'); 
+      document.getElementById('bjInfo').textContent = 'WIN'; 
+      document.getElementById('bjInfo').className = 'gi w'; 
+    } else { 
+      showMsg('❌ BUST! You lost', 'lose'); 
+      document.getElementById('bjInfo').textContent = 'LOST'; 
+      document.getElementById('bjInfo').className = 'gi l'; 
+    }
+    waitBtn(document.getElementById('bjBtn'), 5);
+  }, 10000);
+};
+window.playKeno = function() { 
+  const bet = parseInt(document.getElementById('kenoBetAmt').value) || 10; 
+  if (user.coins < bet) return alert('Low balance'); 
+  user.coins -= bet; 
+  updBal(); 
+  document.getElementById('kenoInfo').textContent = 'Drawing numbers...';
+  setTimeout(() => {
+    const matches = Math.floor(Math.random()*6); 
+    const w = matches * bet; 
+    user.coins += w; 
+    updBal(); 
+    if (w > 0) { showMsg('🎉 ' + matches + ' matches! +₹' + w, 'win'); } 
+    else { showMsg('❌ No matches', 'lose'); } 
+    document.getElementById('kenoInfo').textContent = matches + ' matches';
+  }, 10000);
+};
+window.playLottery = function() { 
+  const bet = parseInt(document.getElementById('lotBetAmt').value) || 10; 
+  if (user.coins < bet) return alert('Low balance'); 
+  user.coins -= bet; 
+  updBal(); 
+  document.getElementById('lotInfo').textContent = 'Drawing...';
+  document.getElementById('lotNum').textContent = '??????';
+  setTimeout(() => {
+    const num = Math.floor(Math.random()*1000000).toString().padStart(6,'0');
+    document.getElementById('lotNum').textContent = num;
+    if (Math.random() > 0.9) { 
+      const w = bet * 10; 
+      user.coins += w; 
+      updBal(); 
+      showMsg('🎉 JACKPOT ₹' + w + '!', 'win'); 
+      document.getElementById('lotInfo').textContent = 'JACKPOT'; 
+    } else { 
+      showMsg('❌ Better luck next time', 'lose'); 
+      document.getElementById('lotInfo').textContent = 'No win'; 
+    }
+  }, 10000);
+};
+window.playPoker = function() { 
+  const bet = parseInt(document.getElementById('pokerBetAmt').value) || 20; 
+  if (user.coins < bet) return alert('Low balance'); 
+  user.coins -= bet; 
+  updBal(); 
+  document.getElementById('pokerInfo').textContent = 'Dealing...';
+  document.getElementById('pokerCards').innerHTML = '<span class="card back spinning">🂠</span><span class="card back spinning">🂠</span><span class="card back spinning">🂠</span><span class="card back spinning">🂠</span><span class="card back spinning">🂠</span>';
+  setTimeout(() => {
+    const hand = [0,1,2,3,4].map(() => allCards[Math.floor(Math.random()*allCards.length)]);
+    document.getElementById('pokerCards').innerHTML = hand.map(c => `<span class="${getCardClass(c)}">${c}</span>`).join('');
+    if (Math.random() > 0.5) { 
+      user.coins += bet * 2; 
+      updBal(); 
+      showMsg('🎉 YOU WON ₹' + (bet*2) + '!', 'win'); 
+      document.getElementById('pokerInfo').textContent = 'WIN'; 
+      document.getElementById('pokerInfo').className = 'gi w'; 
+    } else { 
+      showMsg('❌ YOU LOST!', 'lose'); 
+      document.getElementById('pokerInfo').textContent = 'LOST'; 
+      document.getElementById('pokerInfo').className = 'gi l'; 
+    }
+  }, 10000);
+};
+
+// ADMIN
+window.loadAdmin = async function(type = 'users') { 
+  document.getElementById('adminTitle').textContent = type === 'users' ? '👥 Users' : type === 'deposits' ? '💳 Deposits' : type === 'withdraws' ? '💸 Withdraws' : '🎮 Game Control'; 
+  if (type === 'users') { 
+    try { const res = await fetch(API + '/api/admin/users', { headers: { 'Authorization': 'Bearer ' + token } }); const data = await res.json(); if (data.error) { document.getElementById('adminList').innerHTML = '<div class="empty">Not authorized</div>'; return; } document.getElementById('adminTotal').textContent = data.users?.length || 0; document.getElementById('adminList').innerHTML = data.users?.map(u => `<div class="hi"><span>${u.email}</span><span style="color:#22c55e">₹${u.coins}</span></div>`).join('') || '<div class="empty">No users</div>'; } catch (e) { document.getElementById('adminList').innerHTML = '<div class="empty">Error</div>'; } 
+  } else if (type === 'games') {
+    const games = GAMES.all;
+    document.getElementById('adminList').innerHTML = games.map(g => `<div class="admin-toggle"><span>${g.i} ${g.n}</span><input type="checkbox" ${isGameOn(g.g)?'checked':''} onchange="toggleGame('${g.g}',this.checked)"></div>`).join('');
+  } else { 
+    const filtered = transactions.filter(t => type === 'deposits' ? (t.type === 'deposit' || t.type === 'bonus') : t.type === 'withdraw'); 
+    document.getElementById('adminList').innerHTML = filtered.map(t => `<div class="hi"><span>${t.email}<br><small>${t.time}</small></span><span style="color:${t.type==='withdraw'?'#ef4444':'#22c55e'}">₹${t.amt}</span></div>`).join('') || '<div class="empty">No records</div>'; 
+  } 
+};
+window.toggleGame = function(g, on) { gameStatus[g] = on; localStorage.setItem('gameStatus', JSON.stringify(gameStatus)); drawGames(); alert(g + ' is now ' + (on ? 'ON' : 'OFF')); };
+
+if (token && user) showHome();
+</script>
+</body>
+</html>
